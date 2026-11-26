@@ -1,0 +1,825 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Education Mines Consultancy | Management</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/nepali-date-converter@3.4.2/dist/nepali-date-converter.umd.js"></script>
+<style>
+:root{--navy:#102b52;--blue:#1769aa;--pale:#eef5fb;--ink:#172437;--muted:#64748b;--line:#dce5ef;--bg:#f5f7fb;--white:#fff;--green:#16804a;--red:#b42318}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,Segoe UI,Arial,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:9px;padding:10px 14px;background:var(--blue);color:white;font-weight:650}button.secondary{background:#e8eef5;color:var(--navy)}button.danger{background:#fff0ef;color:var(--red)}button:disabled{opacity:.55;cursor:not-allowed}
+.auth-wrap{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(135deg,#eaf2fb,#f8fafc)}
+.auth-card{width:min(440px,100%);background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:0 16px 45px #102b5214}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:20px}.brand-mark{width:46px;height:46px;border-radius:13px;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:800;font-size:19px}.brand h1{font-size:18px;margin:0;color:var(--navy)}.brand p{margin:2px 0;color:var(--muted);font-size:12px}
+label{display:block;font-weight:650;margin:12px 0 5px}input,select,textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:10px 11px;background:white;color:var(--ink);outline:none}input:focus,select:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #1769aa18}textarea{min-height:76px;resize:vertical}.auth-actions{display:flex;gap:9px;margin-top:16px}.auth-actions button{flex:1}.hint{font-size:12px;color:var(--muted);margin-top:14px}.error{color:var(--red);font-size:13px;margin-top:12px}.success{color:var(--green);font-size:13px;margin-top:12px}
+#app{display:none;min-height:100vh}.topbar{height:66px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:sticky;top:0;z-index:5}.topbar .brand{margin:0}.topbar .brand-mark{width:38px;height:38px;font-size:16px}.topbar .brand h1{font-size:15px}.userbox{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:12px}
+.layout{display:grid;grid-template-columns:225px minmax(0,1fr);min-height:calc(100vh - 66px)}aside{background:var(--navy);padding:18px 12px;color:white}aside .navlabel{font-size:10px;letter-spacing:1.3px;color:#b7c8dc;padding:10px 12px}nav button{display:flex;width:100%;align-items:center;text-align:left;background:transparent;color:#d9e6f4;margin:3px 0;padding:11px 12px;font-weight:550}nav button.active,nav button:hover{background:#ffffff1c;color:#fff}main{padding:26px;max-width:1500px;width:100%;margin:auto}.pagehead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px}.pagehead h2{margin:0;font-size:23px;color:var(--navy)}.pagehead p{margin:4px 0 0;color:var(--muted)}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}.stat{background:#fff;border:1px solid var(--line);border-radius:13px;padding:17px}.stat small{color:var(--muted)}.stat strong{display:block;font-size:25px;margin-top:4px;color:var(--navy)}.panel{background:#fff;border:1px solid var(--line);border-radius:13px;padding:17px;margin-bottom:16px}.toolbar{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}.toolbar input{max-width:330px}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:650px}th,td{text-align:left;padding:11px 10px;border-bottom:1px solid #edf1f6;vertical-align:middle}th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);background:#fafbfd}td{font-size:13px}.muted{color:var(--muted)}.pill{display:inline-block;padding:3px 8px;border-radius:20px;background:var(--pale);color:var(--navy);font-size:11px}.actions{display:flex;gap:6px}.actions button{padding:6px 9px;font-size:12px}.empty{text-align:center;color:var(--muted);padding:30px}.notice{padding:11px 13px;background:#eff6ff;border:1px solid #d8e8fa;color:#174b7a;border-radius:10px;margin-bottom:15px;font-size:13px}.urgent-banner{padding:14px 16px;background:#b42318;color:white;border-radius:10px;margin:0 0 16px;font-weight:700;box-shadow:0 5px 16px #b4231830}.urgent-banner small{display:block;font-weight:500;opacity:.95;margin-top:3px}.activity-list{display:grid;gap:9px;margin:12px 0}.activity-item{border-left:3px solid #1769aa;background:#f6f9fc;padding:9px 12px;border-radius:0 8px 8px 0}.activity-item small{display:block;color:#64748b;margin-top:3px}.contact-links{display:flex;gap:5px;flex-wrap:wrap}.contact-links a{display:inline-block;text-decoration:none;background:#eaf4ff;color:#12528a;border-radius:7px;padding:5px 8px;font-size:12px;font-weight:650}.due{color:#b42318;font-weight:700}.report-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.report-row{display:flex;justify-content:space-between;border-bottom:1px solid #edf1f6;padding:8px 0}.formhint{font-size:12px;color:#64748b;margin-top:4px}.profile-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.profile-item{background:#f7f9fc;padding:12px;border-radius:9px}.profile-item small{display:block;color:#64748b}.profile-item strong{display:block;margin-top:3px}.bs-picker{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.subnav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}@media(max-width:520px){.profile-grid{grid-template-columns:1fr}}
+.modal{position:fixed;inset:0;background:#0b1e35a6;display:none;align-items:center;justify-content:center;padding:18px;z-index:20}.modal.show{display:flex}.modalbox{background:white;border-radius:16px;width:min(650px,100%);max-height:90vh;overflow:auto;padding:22px}.modalhead{display:flex;justify-content:space-between;align-items:center}.modalhead h3{margin:0;color:var(--navy)}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.formgrid .full{grid-column:1/-1}.modalfoot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.statusline{font-size:12px;color:var(--muted)}.mobile-nav{display:none}
+@media(max-width:850px){.layout{grid-template-columns:1fr}aside{padding:7px 10px;position:sticky;top:66px;z-index:4}aside .navlabel{display:none}nav{display:flex;overflow:auto;gap:4px}nav button{white-space:nowrap;width:auto;padding:9px 11px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}main{padding:17px}.topbar{padding:0 14px}.userbox span{display:none}}
+@media(max-width:520px){.cards{grid-template-columns:1fr 1fr;gap:8px}.stat{padding:12px}.stat strong{font-size:20px}.pagehead{align-items:flex-start;flex-direction:column}.formgrid{grid-template-columns:1fr}.formgrid .full{grid-column:auto}.auth-card{padding:21px}}
+</style>
+</head>
+<body>
+<section id="auth" class="auth-wrap">
+ <div class="auth-card">
+  <div class="brand"><div class="brand-mark">EM</div><div><h1>Education Mines Consultancy</h1><p>Management Portal · Lalbandi, Sarlahi</p></div></div>
+  <h2 id="authTitle" style="color:#102b52;margin:0 0 4px">Staff Login</h2>
+  <p class="muted" style="margin:0 0 15px">Sign in to access shared EMC records.</p>
+  <div id="signupNameWrap" style="display:none"><label>Full name</label><input id="signupName" autocomplete="name" placeholder="Your full name"></div>
+  <label>Email address</label><input id="email" type="email" autocomplete="username" placeholder="staff@example.com">
+  <label>Password</label><input id="password" type="password" autocomplete="current-password" placeholder="Password">
+  <div class="auth-actions"><button id="loginBtn" onclick="login()">Sign in</button><button class="secondary" id="signupBtn" onclick="signupAction()">Create account</button></div>
+  <div style="margin-top:12px"><button class="secondary" style="width:100%" onclick="resetPassword()">Forgot password?</button></div>
+  <div id="authMsg"></div>
+  <p class="hint">New accounts remain pending until an EMC administrator approves the account and assigns a role. Never share your password.</p>
+ </div>
+</section>
+
+<div id="app">
+ <header class="topbar">
+  <div class="brand"><div class="brand-mark">EM</div><div><h1>Education Mines Consultancy</h1><p>Shared Management System</p></div></div>
+  <div class="userbox"><span id="who"></span><button class="secondary" onclick="logout()">Sign out</button></div>
+ </header>
+ <div class="layout">
+  <aside><div class="navlabel">WORKSPACE</div><nav id="nav">
+   <button class="active" data-page="dashboard" onclick="showPage('dashboard')">▦ &nbsp; Dashboard</button>
+   <button data-page="students" onclick="showPage('students')">♙ &nbsp; Students</button>
+   <button data-page="payments" onclick="showPage('payments')">＄ &nbsp; Payments</button>
+   <button data-page="expenses" onclick="showPage('expenses')">↗ &nbsp; Expenses</button>
+   <button data-page="staff" onclick="showPage('staff')">♧ &nbsp; Staff</button>
+   <button id="salaryNav" data-page="salary" style="display:none" onclick="showPage('salary')">＄ &nbsp; Staff Payroll</button>
+   <button id="rentNav" data-page="house_rent" style="display:none" onclick="showPage('house_rent')">⌂ &nbsp; House Rent</button>
+   <button data-page="leads" onclick="showPage('leads')">◎ &nbsp; Inquiries / CRM</button>
+   <button data-page="visa" onclick="showPage('visa')">▤ &nbsp; Visa Tracking</button>
+   <button data-page="reports" onclick="showPage('reports')">▥ &nbsp; Reports</button>
+   <button data-page="approvals" id="approvalNav" style="display:none" onclick="showPage('approvals')">✓ &nbsp; Account Approvals</button>
+  </nav></aside>
+  <main>
+   <div class="notice" id="syncNotice">Connected records are shared through Supabase. Changes made by approved EMC users appear for other users automatically.</div>
+   <div id="urgentBanner" class="urgent-banner" style="display:none"></div>
+   <div id="page"></div>
+   <section class="panel" id="globalContact" style="margin-top:22px">
+    <h3 style="margin:0 0 8px;color:#102b52">Contact Education Mines Consultancy</h3>
+    <p class="muted" style="margin:0 0 10px">Official support and inquiry channels · Lalbandi, Sarlahi</p>
+    <div class="contact-links">
+     <a href="tel:+9779705522322">Call +977 9705522322</a>
+     <a href="sms:+9779705522322">SMS</a>
+     <a href="https://wa.me/9779705522322" target="_blank" rel="noopener">Official WhatsApp</a>
+     <a href="https://www.facebook.com/Educationmines" target="_blank" rel="noopener">Official Facebook</a>
+    </div>
+   </section>
+  </main>
+ </div>
+</div>
+
+<div class="modal" id="recordModal">
+ <div class="modalbox">
+  <div class="modalhead"><h3 id="modalTitle">Add record</h3><button class="secondary" onclick="closeModal()">✕</button></div>
+  <form id="recordForm" onsubmit="saveRecord(event)"><div class="formgrid" id="formFields"></div>
+   <div class="modalfoot"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button type="submit" id="saveBtn">Save record</button></div>
+  </form>
+ </div>
+</div>
+
+<script>
+const SUPABASE_URL="https://fikqnnqfgkcohuqrqaar.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_LJoMTosM9HyCAIm53x-6-g_CJ2IazYh";
+const TABLE="emc_records",ACTIVITY="emc_activity_log";
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const modules={
+ students:{title:"Students",singular:"Student",fields:[["name","Full name","text",true],["phone","Phone","tel"],["email","Email","email"],["destination","Country / Destination","text"],["course","Course / Program","text"],["college","College / Institution","text"],["intake","Intake","text"],["total_fee","Total Fee (NPR)","number"],["followup","Next Follow-up","date"],["status","Status","select",false,["New","Counselling","Applied","COE Granted","Visa Granted","Enrolled","Completed","Cancelled"]],["passport","Passport number","text"],["notes","Notes","textarea"]],cols:["name","phone","destination","course","total_fee","paid","due","status"]},
+ payments:{title:"Payments",singular:"Payment",fields:[["student_id","Student","student",true],["amount","Amount (NPR)","number",true],["method","Payment method","select",false,["Cash","Bank Transfer","Online","Other"]],["date","Payment date","date"],["reference","Reference / Receipt no.","text"],["note","Note","textarea"]],cols:["student","amount","method","date","reference"]},
+ expenses:{title:"Expenditure Ledger",singular:"Expense",fields:[["title","Expense title","text",true],["category","Category","select",false,["Staff Salary","House Rent","Marketing","Office","Travel","Utilities","Other"]],["payee_name","Payee / Item Name","text",true],["payee_code","Payee / Item Code","text"],["expense_code","Expense Code","text"],["amount","Amount (NPR)","number",true],["date","Payment date","date"],["note","Note","textarea"]],cols:["title","category","payee_name","payee_code","amount","date"]},
+ staff:{title:"Staff",singular:"Staff member",fields:[["name","Full name","text",true],["phone","Contact number","tel",true],["email","Email","email"],["position","Position","text"],["salary","Monthly base salary (NPR)","number"],["status","Status","select",false,["Active","On leave","Inactive"]],["joined_bs","Join Date (B.S. YYYY-MM-DD)","bsdate"],["note","Note","textarea"]],cols:["name","phone","position","salary","status","joined_bs"]},
+ salary:{title:"Salary Ledger",singular:"Monthly salary entry",fields:[["staff_id","Staff member","staff",true],["bs_month","Nepali month","select",true,["Baishakh","Jestha","Ashadh","Shrawan","Bhadra","Ashwin","Kartik","Mangsir","Poush","Magh","Falgun","Chaitra"]],["bs_year","B.S. Year","number",true],["base_salary","Monthly base salary (NPR)","number",true],["leave_days","Total leave days taken","number"],["advance","Advance salary taken (NPR)","number"],["previous_received","Previous / partial payment (NPR)","number"],["other_deductions","Other deductions (NPR)","number"],["note","Note","textarea"]],cols:["staff_name","bs_month","bs_year","base_salary","leave_days","leave_deduction","advance","previous_received","other_deductions","net_payable","status"]},
+ house_rent:{title:"House Rent",singular:"House rent record",fields:[["property_name","Property / House Name","text",true],["landlord_name","Landlord Name","text",true],["landlord_contact","Landlord Contact","tel"],["monthly_rent","Monthly Rent Amount (NPR)","number",true],["bs_month","Nepali Month (B.S.)","select",true,["Baishakh","Jestha","Ashadh","Shrawan","Bhadra","Ashwin","Kartik","Mangsir","Poush","Magh","Falgun","Chaitra"]],["bs_year","B.S. Year","number",true],["paid_amount","Paid Amount (NPR)","number"],["payment_date_bs","Payment Date (B.S. YYYY-MM-DD)","bsdate"],["status","Payment Status","select",false,["Paid","Partial","Unpaid"]],["note","Note","textarea"]],cols:["property_name","landlord_name","landlord_contact","monthly_rent","bs_month","bs_year","paid_amount","due_amount","status","payment_date_bs"]},
+ leads:{title:"Leads / CRM",singular:"Lead",fields:[["name","Name","text",true],["phone","Phone","tel"],["destination","Interested country","text"],["course","Interested course","text"],["source","Lead source","select",false,["Walk-in","Facebook","Referral","Website","Phone","Other"]],["followup","Next follow-up","date"],["status","Follow-up status","select",false,["New","Contacted","Counselling","Converted","Not interested"]],["note","Note","textarea"]],cols:["name","phone","destination","course","status","followup"]},
+ visa:{title:"Visa Tracking",singular:"Visa case",fields:[["student","Student name","text",true],["phone","Phone","tel"],["destination","Country","text"],["visa_type","Visa type","select",false,["Student","SSW","TITP","Work","Visitor","Other"]],["application_date","Application date","date"],["followup","Next Follow-up","date"],["status","Visa status","select",false,["Preparing","Submitted","Under process","Approved","Rejected","Completed"]],["reference","Application / COE reference","text"],["remarks","Remarks","textarea"]],cols:["student","phone","destination","course","intake","passport","student_status","status","total_fee","paid","due"]}
+};
+let currentUser=null,currentRoles=[],isAdmin=false,currentPage="dashboard",records=[],editing=null,channel=null,activityContext=null,visaViewRows=[],adminSummary=null;
+let accountingDayRows=[],accountingPayrollRows=[],accountingRentRows=[],accountingProperties=[],accountingAccounts=[],accountingPeriods=[],accountingStaffSalaryMasters=[],staffPayrollSettings=[],staffLeaveRecords=[],accountingAdvances=[],accountingAdvanceApplications=[],accountingPayrollTransactions=[],accountingRentPayments=[],accountingUtilityBills=[],expenseTab="daybook";
+let showInactiveRentProperties=false;
+const $=id=>document.getElementById(id),today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;};
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function authMsg(t,kind="error"){$("authMsg").className=kind;$ ("authMsg").textContent=t;}
+let signupMode=false;
+function signupAction(){if(!signupMode){signupMode=true;$ ("signupNameWrap").style.display="block";$ ("authTitle").textContent="Create staff account";$ ("loginBtn").style.display="none";$ ("signupBtn").textContent="Register account";$ ("authMsg").textContent="";}else{signup();}}
+async function login(){const email=$ ("email").value.trim(),password=$ ("password").value;if(!email||!password)return authMsg("Enter your email and password.");$ ("loginBtn").disabled=true;const {error}=await sb.auth.signInWithPassword({email,password});$ ("loginBtn").disabled=false;if(error)return authMsg(error.message);await checkAccess();}
+async function signup(){const name=$ ("signupName").value.trim(),email=$ ("email").value.trim(),password=$ ("password").value;if(!name||!email||password.length<8)return authMsg("Enter your name and email. Password must be at least 8 characters.");const {error}=await sb.auth.signUp({email,password,options:{data:{full_name:name}}});if(error)return authMsg(error.message);signupMode=false;$ ("signupNameWrap").style.display="none";$ ("authTitle").textContent="Staff Login";$ ("loginBtn").style.display="block";$ ("signupBtn").textContent="Create account";authMsg("Account request submitted. Verify your email if requested. An EMC administrator must approve your account and assign a role before access.","success");}
+async function resetPassword(){const email=$ ("email").value.trim();if(!email)return authMsg("Enter your email address first.");const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin});if(error)return authMsg(error.message);authMsg("Password reset email sent, if this address has an account.","success");}
+async function checkAccess(){const {data:{user},error}=await sb.auth.getUser();if(error||!user){$ ("auth").style.display="grid";$ ("app").style.display="none";return;}currentUser=user;const [prof,roleRes]=await Promise.all([sb.from("profiles").select("full_name,approval_status").eq("id",user.id).maybeSingle(),sb.from("user_roles").select("role").eq("user_id",user.id)]);if(prof.error||roleRes.error){await sb.auth.signOut();return authMsg("Could not verify account access: "+(prof.error||roleRes.error).message);}currentRoles=(roleRes.data||[]).map(x=>x.role);if(!currentRoles.length||!prof.data||prof.data.approval_status!=="approved"){await sb.auth.signOut();$ ("auth").style.display="grid";$ ("app").style.display="none";return authMsg("Your account is registered but not yet approved or assigned an EMC role. Please ask your administrator.");}isAdmin=currentRoles.includes("admin");$("approvalNav").style.display=isAdmin?"flex":"none";$("salaryNav").style.display=isAdmin?"flex":"none";$("rentNav").style.display=isAdmin?"flex":"none";$ ("who").textContent=(prof.data.full_name||user.email)+" · "+currentRoles.join(", ");$ ("auth").style.display="none";$ ("app").style.display="block";await loadRecords();subscribeRealtime();}
+async function logout(){if(channel)await sb.removeChannel(channel);await sb.auth.signOut();location.reload();}
+function adDateInNepal(date){if(!(date instanceof Date)||Number.isNaN(date.getTime()))return null;const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kathmandu",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(date).reduce((o,p)=>(o[p.type]=p.value,o),{});return `${parts.year}-${parts.month}-${parts.day}`;}
+async function ensureFutureBsCalendarPeriods(){
+ if(!isAdmin||!window.NepaliDate)return;
+ try{
+  const now=nepaliNow();if(!now)return;const known=new Set(accountingPeriods.map(p=>`${p.bs_year}-${p.month_number}`)),missing=[];
+  for(let offset=0;offset<48;offset++){
+   const absolute=now.month+offset,year=now.year+Math.floor(absolute/12),month=absolute%12,key=`${year}-${month+1}`;if(known.has(key))continue;
+   const startObj=new NepaliDate(year,month,1),nextObj=new NepaliDate(year,month+1,1),startDate=adDateInNepal(startObj.toJsDate()),nextStart=nextObj.toJsDate();
+   if(!startDate||!(nextStart instanceof Date)||Number.isNaN(nextStart.getTime()))continue;
+   const endDate=adDateInNepal(new Date(nextStart.getTime()-86400000));if(!endDate||endDate<startDate)continue;
+   missing.push({bs_year:year,month_number:month+1,month_name:BS_MONTHS[month],start_ad_date:startDate,end_ad_date:endDate,is_active:true});known.add(key);
+  }
+  if(missing.length){const {error}=await sb.from("nepali_month_periods").insert(missing);if(error){console.warn("Could not extend official B.S. month periods:",error.message);return;}accountingPeriods=[...accountingPeriods,...missing].sort((a,b)=>Number(a.bs_year)-Number(b.bs_year)||Number(a.month_number)-Number(b.month_number));}
+ }catch(err){console.warn("B.S. calendar extension was skipped:",err?.message||err);}
+}
+async function loadRecords(){
+ const notice=$("syncNotice");notice.textContent="Loading shared EMC records and accounting ledgers…";
+ const [base,visa,financial,periods,properties,salaryMasters,payrollSettings,leaveRecords,advances,advanceApps]=await Promise.all([
+  sb.from(TABLE).select("id,record_type,record_key,data").order("record_key"),
+  sb.from("visa_tracking_view").select("*"),
+  sb.from("admin_financial_summary").select("*").maybeSingle(),
+  sb.from("nepali_month_periods").select("*").order("bs_year").order("month_number"),
+  isAdmin?sb.from("house_properties").select("*"):Promise.resolve({data:[],error:null}),
+  isAdmin?sb.from("staff_salary_master").select("staff_record_key,monthly_base_salary"):Promise.resolve({data:[],error:null}),
+  isAdmin?sb.from("staff_payroll_settings").select("*"):Promise.resolve({data:[],error:null}),
+  isAdmin?sb.from("staff_leave_records").select("*").order("start_date_bs"):Promise.resolve({data:[],error:null}),
+  isAdmin?sb.from("accounting_advances").select("*").eq("is_reversed",false):Promise.resolve({data:[],error:null}),
+  isAdmin?sb.from("accounting_advance_applications").select("*"):Promise.resolve({data:[],error:null})
+ ]);
+ if(base.error){notice.textContent="Database error: "+base.error.message;return;}
+ records=base.data||[];visaViewRows=visa.error?[]:(visa.data||[]);adminSummary=financial.error?null:financial.data;
+ accountingPeriods=periods.error?[]:(periods.data||[]);accountingProperties=properties.error?[]:(properties.data||[]);accountingStaffSalaryMasters=salaryMasters.error?[]:(salaryMasters.data||[]);
+ staffPayrollSettings=payrollSettings.error?[]:(payrollSettings.data||[]);staffLeaveRecords=leaveRecords.error?[]:(leaveRecords.data||[]);accountingAdvances=advances.error?[]:(advances.data||[]);accountingAdvanceApplications=advanceApps.error?[]:(advanceApps.data||[]);
+ if(isAdmin){await ensureFutureBsCalendarPeriods();const processed=await sb.rpc("process_nepali_monthly_obligations");if(processed.error)console.warn("Nepali monthly processing:",processed.error.message);}
+ await refreshAccountingData();
+ notice.textContent="Connected · Shared Supabase accounting · "+records.length+" EMC records";
+ renderPage();
+}
+async function refreshAccountingData(){
+ const [daybook,payroll,rent,accounts,properties,salaryMasters,payrollTx,rentPayments,advances,advanceApps,payrollSettings,leaveRecords]=await Promise.all([
+  sb.from("accounting_day_book").select("*").order("date_ad",{ascending:false}).limit(5000),
+  isAdmin?sb.from("staff_payroll").select("*").eq("is_voided",false).order("bs_year",{ascending:false}).order("bs_month_number",{ascending:false}):Promise.resolve({data:[],error:null}),
+  isAdmin?sb.from("house_rent_ledger").select("*").eq("is_voided",false).order("bs_year",{ascending:false}).order("bs_month_number",{ascending:false}):Promise.resolve({data:[],error:null}),
+  sb.from("accounting_accounts").select("id,account_code,account_name,is_cash_bank,opening_balance,is_active").eq("is_active",true),
+  isAdmin?sb.from("house_properties").select("*"):Promise.resolve({data:[],error:null}),
+  isAdmin?sb.from("staff_salary_master").select("staff_record_key,monthly_base_salary"):Promise.resolve({data:[],error:null}),
+  isAdmin?sb.from("staff_payroll_transactions").select("*").eq("is_reversed",false).order("payment_date_bs"):Promise.resolve({data:[],error:null}),
+  isAdmin?sb.from("house_rent_payments").select("*").eq("is_reversed",false).order("payment_date_bs"):Promise.resolve({data:[],error:null}),
+  isAdmin?sb.from("accounting_advances").select("*").eq("is_reversed",false):Promise.resolve({data:[],error:null}),
+  isAdmin?sb.from("accounting_advance_applications").select("*").order("application_date_bs"):Promise.resolve({data:[],error:null}),
+  isAdmin?sb.from("staff_payroll_settings").select("*"):Promise.resolve({data:[],error:null}),
+  isAdmin?sb.from("staff_leave_records").select("*").order("start_date_bs"):Promise.resolve({data:[],error:null})
+ ]);
+ accountingDayRows=daybook.error?[]:(daybook.data||[]);
+ accountingPayrollRows=payroll.error?[]:(payroll.data||[]);
+ accountingRentRows=rent.error?[]:(rent.data||[]);
+ accountingAccounts=accounts.error?[]:(accounts.data||[]);
+ if(!properties.error)accountingProperties=properties.data||[];
+ accountingStaffSalaryMasters=salaryMasters.error?[]:(salaryMasters.data||[]);
+ accountingPayrollTransactions=payrollTx.error?[]:(payrollTx.data||[]);accountingRentPayments=rentPayments.error?[]:(rentPayments.data||[]);
+ accountingAdvances=advances.error?[]:(advances.data||[]);accountingAdvanceApplications=advanceApps.error?[]:(advanceApps.data||[]);
+ const utilityBills=await sb.from("utility_bills").select("*").order("bill_date_ad",{ascending:false}).limit(1000);
+ accountingUtilityBills=utilityBills.error?[]:(utilityBills.data||[]);
+ staffPayrollSettings=payrollSettings.error?[]:(payrollSettings.data||[]);staffLeaveRecords=leaveRecords.error?[]:(leaveRecords.data||[]);
+ if(daybook.error)console.warn("Day Book could not load:",daybook.error.message);
+ if(payroll.error)console.warn("Payroll ledger could not load:",payroll.error.message);
+ if(rent.error)console.warn("House rent ledger could not load:",rent.error.message);
+}
+function subscribeRealtime(){if(channel)sb.removeChannel(channel);channel=sb.channel("emc-shared-records").on("postgres_changes",{event:"*",schema:"public",table:TABLE},async()=>await loadRecords()).on("postgres_changes",{event:"INSERT",schema:"public",table:ACTIVITY},async payload=>{const row=payload.new;if(activityContext&&row.record_type===activityContext.type&&Number(row.record_key)===Number(activityContext.id))await showActivity(activityContext.type,activityContext.id);});if(isAdmin){["staff_payroll","house_rent_ledger","staff_payroll_transactions","house_rent_payments","accounting_advances","accounting_advance_applications","staff_leave_records","staff_payroll_settings","house_properties","utility_bills"].forEach(t=>{channel=channel.on("postgres_changes",{event:"*",schema:"public",table:t},async()=>await loadRecords());});}channel=channel.subscribe();}
+function list(type){
+ if(type==="visa"&&visaViewRows.length)return visaViewRows.map(v=>({id:Number(v.visa_record_id),student_id:Number(v.student_id),student:v.student_name,phone:v.phone,destination:v.destination,course:v.course,intake:v.intake,passport:v.passport,visa_type:v.visa_type,student_status:v.student_status,status:v.visa_status,followup:v.followup,total_fee:Number(v.total_fee)||0,paid_amount:Number(v.paid_amount)||0,remaining_due:Number(v.remaining_due)||0}));
+ if(type==="salary"){
+  const normalized=accountingPayrollRows.map(p=>{const accrued=accountingDayRows.some(j=>j.source_type==="staff_payroll"&&String(j.source_id)===String(p.id)&&j.event_type==="accrual"&&j.status==="posted");return {id:p.id,staff_id:p.staff_record_key,staff_name:p.staff_name,bs_month:p.bs_month_name,bs_year:p.bs_year,base_salary:Number(p.monthly_base_salary)||0,leave_days:Number(p.leave_days)||0,leave_deduction:Number(p.leave_deduction)||0,advance:Number(p.advance_taken)||0,previous_received:Number(p.previous_received_amount)||0,other_deductions:Number(p.other_deductions)||0,net_payable:Number(p.net_payable_salary)||0,status:accrued?p.status:"Accrual Pending",note:p.notes||"",legacy:false,accrual_posted:accrued};});
+  const legacy=records.filter(r=>r.record_type==="salary").map(r=>({...r.data,id:"legacy-"+r.record_key,legacy:true,status:"Legacy / Unlinked"})).filter(x=>!normalized.some(n=>String(n.staff_name||"").trim().toLowerCase()===String(x.staff_name||"").trim().toLowerCase()&&String(n.bs_month||"").toLowerCase()===String(x.bs_month||"").toLowerCase()&&Number(n.bs_year)===Number(x.bs_year)));
+  return [...normalized,...legacy];
+ }
+ if(type==="house_rent")return accountingRentRows.map(l=>{const h=accountingProperties.find(x=>x.id===l.property_id)||{};const accrued=accountingDayRows.some(j=>j.source_type==="house_rent_ledger"&&String(j.source_id)===String(l.id)&&j.event_type==="accrual"&&j.status==="posted");return {id:l.id,property_name:h.property_name||"Property",landlord_name:h.landlord_name||"Landlord",landlord_contact:h.landlord_contact||"",monthly_rent:Number(l.monthly_rent)||0,bs_month:l.bs_month_name,bs_year:l.bs_year,paid_amount:Number(l.paid_amount)||0,due_amount:Number(l.due_amount)||0,status:accrued?l.payment_status:"Accrual Pending",payment_date_bs:l.payment_date_bs,note:l.notes||"",accrual_posted:accrued};});
+ const result=records.filter(r=>r.record_type===type).map(r=>r.data);if(type==="staff"&&isAdmin)return result.map(x=>({...x,salary:Number(accountingStaffSalaryMasters.find(m=>String(m.staff_record_key)===String(x.id))?.monthly_base_salary)||0}));return result.sort((a,b)=>(Number(a.id)||0)-(Number(b.id)||0));
+}
+function students(){return list("students");}
+function paidFor(student){if(student.paid_amount!=null)return Number(student.paid_amount)||0;return list("payments").filter(p=>(p.student_id!=null&&Number(p.student_id)===Number(student.id))||(!p.student_id&&p.student===student.name)).reduce((s,p)=>s+(Number(p.amount)||0),0);}
+function dueFor(student){if(student.remaining_due!=null)return Number(student.remaining_due)||0;return Math.max(0,(Number(student.total_fee)||0)-paidFor(student));}
+function money(n){return "Rs. "+(Number(n)||0).toLocaleString("en-IN",{maximumFractionDigits:2});}
+function showPage(p){if(["approvals","salary","house_rent"].includes(p)&&!isAdmin)return alert("This section is restricted to administrators.");currentPage=p;document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===p));renderPage();}
+function urgentItems(){const items=[];for(const type of ["students","leads","visa"]){for(const x of list(type)){const d=x.followup||x.next_followup||x.follow_up_date;if(d&&d<=today()&&!(["Completed","Cancelled","Approved","Rejected","Converted","Not interested","Visa Granted","Enrolled"].includes(x.status))){items.push({type,name:x.name||x.student||"Unnamed",date:d,overdue:d<today()});}}}return items;}
+function updateUrgentBanner(){const u=urgentItems(),el=$ ("urgentBanner");if(!u.length){el.style.display="none";return;}el.style.display="block";el.innerHTML=`⚠ URGENT: ${u.length} follow-up task(s) due or overdue.<small>${u.slice(0,5).map(x=>`${esc(x.name)} · ${esc(modules[x.type].title)} · ${x.overdue?"OVERDUE":"DUE TODAY"}`).join(" &nbsp; | &nbsp; ")}${u.length>5?` · +${u.length-5} more`:""}</small>`;}
+function renderPage(){if($ ("app").style.display==="none")return;updateUrgentBanner();if(currentPage==="dashboard")return renderDashboard();if(currentPage==="reports")return renderReports();if(currentPage==="approvals")return renderApprovals();renderModule(currentPage);}
+function renderDashboard(){const income=list("payments").reduce((s,x)=>s+(Number(x.amount)||0),0),expense=list("expenses").reduce((s,x)=>s+(Number(x.amount)||0),0),country=groupCounts(students(),"destination"),course=groupCounts(students(),"course");const stats=[`<div class="stat"><small>Total students</small><strong>${students().length}</strong></div>`,`<div class="stat"><small>Total leads</small><strong>${list("leads").length}</strong></div>`,`<div class="stat"><small>Total visa cases</small><strong>${list("visa").length}</strong></div>`,`<div class="stat"><small>Total payments</small><strong>${money(income)}</strong></div>`];if(isAdmin){const totalFees=Number(adminSummary?.total_fees)||students().reduce((s,x)=>s+(Number(x.total_fee)||0),0),totalPaid=Number(adminSummary?.total_paid)||income,totalDue=Number(adminSummary?.total_due)||students().reduce((s,x)=>s+dueFor(x),0);stats.push(`<div class="stat"><small>Total student fees</small><strong>${money(totalFees)}</strong></div><div class="stat"><small>Total collected</small><strong>${money(totalPaid)}</strong></div><div class="stat"><small>Total remaining due</small><strong class="due">${money(totalDue)}</strong></div>`);}if(isAdmin){const bs=nepaliNow(),monthPayroll=accountingPayrollRows.filter(p=>bs&&Number(p.bs_year)===bs.year&&Number(p.bs_month_number)===bs.month+1),monthRent=accountingRentRows.filter(p=>bs&&Number(p.bs_year)===bs.year&&Number(p.bs_month_number)===bs.month+1),salaryPaid=accountingPayrollRows.reduce((n,p)=>n+(Number(p.previous_received_amount)||0),0),rentPaid=accountingRentRows.reduce((n,p)=>n+(Number(p.paid_amount)||0),0),salaryDue=accountingPayrollRows.reduce((n,p)=>n+Math.max(0,Number(p.net_payable_salary)||0),0),rentDue=accountingRentRows.reduce((n,p)=>n+Math.max(0,Number(p.due_amount)||0),0),staffAdv=accountingAdvances.filter(a=>a.party_type==="employee").reduce((n,a)=>n+Math.max(0,Number(a.amount||0)-accountingAdvanceApplications.filter(x=>String(x.advance_id)===String(a.id)).reduce((v,x)=>v+Number(x.amount||0),0)),0),landAdv=accountingAdvances.filter(a=>a.party_type==="landlord").reduce((n,a)=>n+Math.max(0,Number(a.amount||0)-accountingAdvanceApplications.filter(x=>String(x.advance_id)===String(a.id)).reduce((v,x)=>v+Number(x.amount||0),0)),0),leaveDeduct=accountingPayrollRows.reduce((n,p)=>n+(Number(p.leave_deduction)||0),0);stats.push(`<div class="stat"><small>Monthly Staff Salary · B.S.</small><strong>${money(monthPayroll.reduce((n,p)=>n+(Number(p.monthly_base_salary)||0),0))}</strong></div><div class="stat"><small>Monthly House Rent · B.S.</small><strong>${money(monthRent.reduce((n,p)=>n+(Number(p.monthly_rent)||0),0))}</strong></div><div class="stat"><small>Total Salary Paid</small><strong>${money(salaryPaid)}</strong></div><div class="stat"><small>Total Rent Paid</small><strong>${money(rentPaid)}</strong></div><div class="stat"><small>Outstanding Staff Salary</small><strong>${money(salaryDue)}</strong></div><div class="stat"><small>Outstanding House Rent</small><strong>${money(rentDue)}</strong></div><div class="stat"><small>Staff Advances Balance</small><strong>${money(staffAdv)}</strong></div><div class="stat"><small>House Owner Advances Balance</small><strong>${money(landAdv)}</strong></div><div class="stat"><small>Unpaid Leave Deductions</small><strong>${money(leaveDeduct)}</strong></div><div class="stat"><small>Total expenses (manual)</small><strong>${money(expense)}</strong></div><div class="stat"><small>Net balance (manual register)</small><strong>${money(income-expense)}</strong></div>`);}$ ("page").innerHTML=`<div class="pagehead"><div><h2>Dashboard</h2><p>Education Mines Consultancy overview</p></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="secondary" onclick="migrateLocalData()">Import old browser data</button><button onclick="exportBackup()">Export backup</button></div></div><div class="cards">${stats.join("")}</div><div class="report-grid"><div class="panel"><h3 style="margin-top:0;color:#102b52">Students by country</h3>${countRows(country)}</div><div class="panel"><h3 style="margin-top:0;color:#102b52">Students by course</h3>${countRows(course)}</div></div><div class="panel"><h3 style="margin-top:0;color:#102b52">Recent students</h3>${tableHTML("students",students().slice(-5).reverse())}</div><div class="panel"><h3 style="margin-top:0;color:#102b52">Shared database</h3><p class="muted">Approved EMC accounts share the same Supabase records. Approved staff and administrators can edit student, lead and payment records. Administrators can view the full edit history, delete records and see net balance.</p><p class="statusline">Signed in: ${esc(currentUser.email)} · Role: ${esc(currentRoles.join(", "))}</p></div>`;}
+function groupCounts(arr,key){const m={};arr.forEach(x=>{const k=String(x[key]||"Not specified").trim();m[k]=(m[k]||0)+1;});return Object.entries(m).sort((a,b)=>b[1]-a[1]);}
+function countRows(rows){return rows.length?rows.slice(0,8).map(([n,c])=>`<div class="report-row"><span>${esc(n)}</span><strong>${c}</strong></div>`).join(""):`<p class="muted">No records yet.</p>`;}
+function renderReports(){const countries=groupCounts(students(),"destination"),courses=groupCounts(students(),"course"),countryFilter=$ ("reportCountry")?.value||"",courseFilter=$ ("reportCourse")?.value||"";let filtered=students().filter(s=>(!countryFilter||s.destination===countryFilter)&&(!courseFilter||s.course===courseFilter));const opts=(arr,val)=>`<option value="">All</option>${arr.map(x=>`<option ${val===x?"selected":""}>${esc(x)}</option>`).join("")}`;$ ("page").innerHTML=`<div class="pagehead"><div><h2>Reports</h2><p>Country-wise and course-wise applicant breakdown</p></div><button class="secondary" onclick="exportBackup()">Export data backup</button></div><div class="panel"><div class="formgrid"><div><label>Filter by country</label><select id="reportCountry" onchange="renderReports()">${opts([...new Set(students().map(s=>s.destination).filter(Boolean))].sort(),countryFilter)}</select></div><div><label>Filter by course / program</label><select id="reportCourse" onchange="renderReports()">${opts([...new Set(students().map(s=>s.course).filter(Boolean))].sort(),courseFilter)}</select></div></div><p><strong>${filtered.length}</strong> matching student/applicant records</p><div class="report-grid"><div><h3>By country</h3>${countRows(groupCounts(filtered,"destination"))}</div><div><h3>By course</h3>${countRows(groupCounts(filtered,"course"))}</div></div></div><div class="panel"><h3 style="margin-top:0">Filtered applicants</h3>${tableHTML("students",filtered)}</div>${isAdmin?`<div class="panel"><h3>Financial summary (Admin only)</h3><p>Student receipts: <strong>${money(list("payments").reduce((s,x)=>s+(Number(x.amount)||0),0))}</strong> · Other manual expenses: <strong>${money(list("expenses").reduce((s,x)=>s+(Number(x.amount)||0),0))}</strong></p><h3>Salary & Rent · B.S. Period Summary</h3><div class="tablewrap"><table><thead><tr><th>B.S. Year</th><th>B.S. Month</th><th>Salary DR</th><th>Salary CR</th><th>Salary Outstanding</th><th>Rent DR</th><th>Rent CR</th><th>Rent Outstanding</th></tr></thead><tbody>${[...new Set([...accountingPayrollRows.map(x=>`${x.bs_year}-${x.bs_month_number}`),...accountingRentRows.map(x=>`${x.bs_year}-${x.bs_month_number}`)])].sort().reverse().map(k=>{const [y,m]=k.split("-").map(Number),sp=accountingPayrollRows.filter(x=>Number(x.bs_year)===y&&Number(x.bs_month_number)===m),rp=accountingRentRows.filter(x=>Number(x.bs_year)===y&&Number(x.bs_month_number)===m);return `<tr><td>${y}</td><td>${esc(BS_MONTHS[m-1]||m)}</td><td>${money(sp.reduce((n,x)=>n+Math.max(0,(Number(x.monthly_base_salary)||0)-(Number(x.leave_deduction)||0)),0))}</td><td>${money(sp.reduce((n,x)=>n+(Number(x.previous_received_amount)||0)+(Number(x.advance_taken)||0)+(Number(x.other_deductions)||0),0))}</td><td>${money(sp.reduce((n,x)=>n+Math.max(0,Number(x.net_payable_salary)||0),0))}</td><td>${money(rp.reduce((n,x)=>n+(Number(x.monthly_rent)||0),0))}</td><td>${money(rp.reduce((n,x)=>n+(Number(x.paid_amount)||0)+(Number(x.advance_applied)||0),0))}</td><td>${money(rp.reduce((n,x)=>n+Math.max(0,Number(x.due_amount)||0),0))}</td></tr>`;}).join("")||`<tr><td colspan="8" class="empty">No salary or rent entries yet.</td></tr>`}</tbody></table></div><div class="formhint">Salary and rent figures are sourced from the linked accounting ledgers. Advance balances are reported separately and are not counted as cash payments twice.</div></div>`:""}`;}
+function renderModule(type){if(type==="expenses")return renderAccountingExpenditurePage();if(["salary","house_rent"].includes(type)){if(!isAdmin){$("page").innerHTML="<div class=notice>Administrator access required.</div>";return;}return renderPrivateLedgerPage(type);}const cfg=modules[type],items=list(type);const leadTools=type==="leads"&&isAdmin?`<div class="panel"><h3 style="margin:0 0 6px;color:#102b52">Admin data tools</h3><p class="muted" style="margin:0 0 14px">Download a ready-to-fill template or upload multiple contacts at once. Required columns: <strong>name, phone</strong>. Optional: destination, source, status, followup, note. Duplicate phone numbers are skipped.</p><div class="actions" style="flex-wrap:wrap"><button class="secondary" onclick="downloadLeadTemplate('xlsx')">Download Excel sample format</button><button class="secondary" onclick="downloadLeadTemplate('csv')">Download CSV sample format</button><label class="secondary" style="display:inline-flex;align-items:center;margin:0;padding:9px 12px;border-radius:9px;cursor:pointer">Upload bulk contacts / Excel<input id="leadBulkFile" type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="importLeadContacts(event)"></label></div><div id="bulkImportMsg" class="formhint" aria-live="polite"></div></div>`:"";$ ("page").innerHTML=`<div class="pagehead"><div><h2>${cfg.title}</h2><p>${type==="expenses"?"Record salary, house rent and other payments against a payee or item code.":"Manage shared "+cfg.title.toLowerCase()+" records."}</p></div>${["salary","house_rent"].includes(type)?"":`<button onclick="openModal('${type}')">＋ Add ${cfg.singular}</button>`}</div>${type==="salary"?`<div class="notice">Monthly salary obligations are generated in the connected payroll ledger for the active Nepali month. Only entries with a posted accrual journal can be paid. Older entries marked “Accrual Pending” are preserved and held from payment until their missing opening accrual is reconciled.</div>`:type==="house_rent"?`<div class="notice">Monthly rent obligations are generated from registered properties. Record rent payments from Expenditure Ledger to synchronize the rent ledger and accounting journal.</div>`:""}${leadTools}<div class="panel"><div class="toolbar"><input id="searchBox" placeholder="Search ${cfg.title.toLowerCase()}…" oninput="filterTable('${type}')"><span class="muted">${items.length} records</span></div><div id="tableArea">${tableHTML(type,items)}</div></div>`;}
+let currentPartyLedgerData=[];
+function validBsDate(value){const a=String(value||"").split("-").map(Number);if(a.length!==3||a.some(x=>!Number.isInteger(x)))return false;if(a[1]<1||a[1]>12||a[2]<1||a[2]>32)return false;if(window.NepaliDate){const d=new NepaliDate(a[0],a[1]-1,a[2]);return d.getYear()===a[0]&&d.getMonth()===a[1]-1&&d.getDate()===a[2];}return true;}
+function partyAdvanceSummary(type,partyId){const partyType=type==="salary"?"employee":"landlord",rows=accountingAdvances.filter(a=>a.party_type===partyType&&String(a.party_id)===String(partyId)),total=rows.reduce((n,a)=>n+(Number(a.amount)||0),0),applied=rows.reduce((n,a)=>n+accountingAdvanceApplications.filter(x=>String(x.advance_id)===String(a.id)).reduce((v,x)=>v+(Number(x.amount)||0),0),0);return {total,applied,remaining:Math.max(0,total-applied)};}
+function partyAdvanceBalance(type,partyId){return partyAdvanceSummary(type,partyId).remaining;}
+function renderPartyLedger(type,partyKey){
+ const salary=type==="salary",from=$("partyLedgerFrom")?.value.trim()||"",to=$("partyLedgerTo")?.value.trim()||"";
+ const staffRow=salary?records.find(r=>r.record_type==="staff"&&String(r.record_key)===String(partyKey)):null;
+ const property=salary?null:accountingProperties.find(x=>String(x.id)===String(partyKey));
+ const partyId=salary?staffRow?.id:property?.id,sourceRows=[];
+ if(salary){
+  const payroll=accountingPayrollRows.filter(p=>String(p.staff_record_key)===String(partyKey));
+  for(const p of payroll)sourceRows.push({date:p.due_date_bs||`${p.bs_year}-${String(p.bs_month_number).padStart(2,"0")}-01`,particulars:`${p.bs_month_name} ${p.bs_year} Salary`,dr:Math.max(0,(Number(p.monthly_base_salary)||0)-(Number(p.leave_deduction)||0)),cr:0,advance:0,source:p.id});
+  const ids=new Set(payroll.map(p=>String(p.id)));
+  for(const t of accountingPayrollTransactions.filter(t=>ids.has(String(t.payroll_id))))sourceRows.push({date:t.payment_date_bs||"",particulars:t.transaction_type==="advance"?"Advance Applied to Salary":t.transaction_type==="other_deduction"?"Other Deduction":"Salary Payment",dr:0,cr:Number(t.amount)||0,advance:0,source:t.id});
+ }else if(property){
+  const rent=accountingRentRows.filter(l=>String(l.property_id)===String(partyKey));
+  for(const l of rent)sourceRows.push({date:l.due_date_bs||`${l.bs_year}-${String(l.bs_month_number).padStart(2,"0")}-01`,particulars:`${l.bs_month_name} ${l.bs_year} Rent`,dr:Number(l.monthly_rent)||0,cr:0,advance:0,source:l.id});
+  const ids=new Set(rent.map(l=>String(l.id)));
+  for(const t of accountingRentPayments.filter(t=>ids.has(String(t.rent_ledger_id))))sourceRows.push({date:t.payment_date_bs||"",particulars:"Rent Payment",dr:0,cr:Number(t.amount)||0,advance:0,source:t.id});
+  for(const a of accountingAdvanceApplications.filter(a=>a.source_type==="house_rent_ledger"&&ids.has(String(a.source_id))))sourceRows.push({date:a.application_date_bs||"",particulars:"Advance Applied to House Rent",dr:0,cr:Number(a.amount)||0,advance:0,source:a.id});
+ }
+ for(const a of accountingAdvances.filter(a=>a.party_type===(salary?"employee":"landlord")&&partyId&&String(a.party_id)===String(partyId))){
+  sourceRows.push({date:a.payment_date_bs||a.created_at?.slice(0,10)||"",particulars:`${salary?"Employee":"Landlord"} Advance Received · Separate Advance`,dr:0,cr:0,advance:Number(a.amount)||0,source:a.id});
+ }
+ sourceRows.sort((a,b)=>String(a.date).localeCompare(String(b.date))||String(a.particulars).localeCompare(String(b.particulars)));
+ const opening=from?sourceRows.filter(x=>x.date&&x.date<from).reduce((n,x)=>n+x.dr-x.cr,0):0;
+ const visible=sourceRows.filter(x=>(!from||!x.date||x.date>=from)&&(!to||!x.date||x.date<=to));
+ let balance=opening;const rows=visible.map(x=>{balance+=x.dr-x.cr;return {...x,balance};});
+ const totalDr=visible.reduce((n,x)=>n+x.dr,0),totalCr=visible.reduce((n,x)=>n+x.cr,0),totalAdvance=visible.reduce((n,x)=>n+(Number(x.advance)||0),0);
+ currentPartyLedgerData=[{date:from?`Opening ${from}`:"Opening",particulars:"Opening Balance",dr:0,cr:0,advance:0,balance:opening},...rows];
+ const partyName=salary?(staffRow?.data?.name||"Staff"):property?.landlord_name||"House Owner";
+ return `<div class="panel"><div class="toolbar" style="flex-wrap:wrap"><div><strong>Individual ${salary?"Salary":"House Rent"} DR / CR Statement · ${esc(partyName)}</strong><div class="formhint">DR = monthly obligation · CR = payment / advance applied · Advance = excess payment held separately, not counted as salary or rent payment</div></div><div class="actions"><button class="secondary" onclick="exportPartyLedger()">Export Excel</button><button class="secondary" onclick="printPartyLedger()">Print / PDF</button></div></div><div class="formgrid"><div><label>From B.S. (YYYY-MM-DD)</label><input id="partyLedgerFrom" value="${esc(from)}" placeholder="2083-04-01" onchange="refreshPartyLedger('${type}','${esc(partyKey)}')"></div><div><label>To B.S. (YYYY-MM-DD)</label><input id="partyLedgerTo" value="${esc(to)}" placeholder="2083-08-30" onchange="refreshPartyLedger('${type}','${esc(partyKey)}')"></div></div><div class="cards"><div class="stat"><small>Opening Balance</small><strong>${money(opening)}</strong></div><div class="stat"><small>Total DR</small><strong>${money(totalDr)}</strong></div><div class="stat"><small>Total CR</small><strong>${money(totalCr)}</strong></div><div class="stat"><small>Advance Received</small><strong>${money(totalAdvance)}</strong></div><div class="stat"><small>Closing Outstanding</small><strong>${money(balance)}</strong></div></div><div class="tablewrap"><table><thead><tr><th>Date (B.S.)</th><th>Particulars</th><th>Debit (DR)</th><th>Credit (CR)</th><th>Advance (Separate)</th><th>Running Balance</th></tr></thead><tbody>${currentPartyLedgerData.map(x=>`<tr><td>${esc(x.date||"—")}</td><td>${esc(x.particulars)}</td><td>${x.dr?money(x.dr):"—"}</td><td>${x.cr?money(x.cr):"—"}</td><td>${x.advance?`<strong>${money(x.advance)}</strong>`:"—"}</td><td><strong>${money(x.balance)}</strong></td></tr>`).join("")||`<tr><td colspan="6" class="empty">No transactions in this date range.</td></tr>`}</tbody></table></div></div>`;
+}
+function refreshPartyLedger(type,key){const host=$("individualPartyLedger");if(host)host.innerHTML=renderPartyLedger(type,key);}
+function exportPartyLedger(){if(!currentPartyLedgerData.length)return alert("No ledger data to export.");if(!window.XLSX)return alert("Excel export library is unavailable.");const ws=XLSX.utils.json_to_sheet(currentPartyLedgerData.map(x=>({"Date (BS)":x.date,Particulars:x.particulars,"Debit (DR)":x.dr,"Credit (CR)":x.cr,"Advance (Separate)":x.advance||0,Balance:x.balance})));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Party Ledger");XLSX.writeFile(wb,"EMC-Individual-Party-Ledger.xlsx");}
+function printPartyLedger(){if(!currentPartyLedgerData.length)return alert("No ledger data to print.");const w=window.open("","_blank","width=950,height=700");if(!w)return alert("Allow pop-ups to print the ledger.");w.document.write(`<html><head><title>EMC Party Ledger</title><style>body{font:13px Arial;padding:24px}h2{text-align:center}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:8px;text-align:left}th{background:#eee}</style></head><body><h2>Education Mines Consultancy Pvt. Ltd.</h2><h3>Individual DR / CR Ledger</h3><table><tr><th>Date (BS)</th><th>Particulars</th><th>DR</th><th>CR</th><th>Advance (Separate)</th><th>Balance</th></tr>${currentPartyLedgerData.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.particulars)}</td><td>${x.dr?money(x.dr):"—"}</td><td>${x.cr?money(x.cr):"—"}</td><td>${x.advance?money(x.advance):"—"}</td><td>${money(x.balance)}</td></tr>` ).join("")}</table><script>window.onload=()=>window.print()<\/script></body></html>`);w.document.close();}
+function openPayrollSettings(staffKey){
+ if(!isAdmin)return alert("Administrator access required.");const row=records.find(r=>r.record_type==="staff"&&String(r.record_key)===String(staffKey));if(!row)return alert("Staff record not found.");const st=row.data||{},cfg=staffPayrollSettings.find(x=>String(x.staff_record_key)===String(staffKey))||{};const current=accountingBSDateToday();
+ $("modalTitle").textContent="Salary Schedule · "+(st.name||"Staff");$("recordForm").setAttribute("onsubmit","savePayrollSettings(event)");$("saveBtn").textContent="Save Salary Schedule";
+ $("formFields").innerHTML=`<div class="full"><p class="muted">Monthly salary is taken from the protected salary master. These dates control which B.S. months are generated.</p></div><input type="hidden" id="payrollSettingsStaffKey" value="${esc(staffKey)}"><div><label>Joining Date (B.S.)</label>${bsDatePicker("joining_date_bs",cfg.joining_date_bs||st.joined_bs||current)}</div><div><label>Salary Start Date (B.S.)</label>${bsDatePicker("salary_start_date_bs",cfg.salary_start_date_bs||st.joined_bs||current)}</div><div><label>Salary End Date (B.S.) · Optional</label><input id="salary_end_date_bs" placeholder="YYYY-MM-DD" value="${esc(cfg.salary_end_date_bs||"")}"><div class="formhint">Leave blank for an active, ongoing employment.</div></div><div><label>Salary Generation Day (1–31)</label><input id="salary_generation_day" type="number" min="1" max="31" value="${Number(cfg.salary_generation_day)||1}"></div>`;
+ $("recordModal").classList.add("show");
+}
+async function savePayrollSettings(e){e.preventDefault();const key=Number($("payrollSettingsStaffKey").value),f=new FormData($("recordForm")),joining=collectBsPicker(f,"joining_date_bs"),start=collectBsPicker(f,"salary_start_date_bs"),end=$("salary_end_date_bs").value.trim()||null,day=Number($("salary_generation_day").value)||1;if(!validBsDate(joining)||!validBsDate(start)||(end&&!validBsDate(end)))return alert("Enter valid Nepali B.S. dates. Check the selected month and day.");if(end&&end<start)return alert("Salary end date cannot be before the salary start date.");if(day<1||day>31)return alert("Generation day must be between 1 and 31.");if(start<accountingBSDateToday()&&!confirm("This past salary start date can generate all missing monthly salary obligations from the selected B.S. month through the current month. Continue?"))return;const {error}=await sb.from("staff_payroll_settings").upsert({staff_record_key:key,joining_date_bs:joining,salary_start_date_bs:start,salary_end_date_bs:end,salary_generation_day:day,updated_by:currentUser?.id||null,updated_at:new Date().toISOString()},{onConflict:"staff_record_key"});if(error)return alert("Could not save salary schedule: "+error.message);closeModal();await loadRecords();alert("Salary schedule saved. The automatic processor will generate eligible B.S. months on the configured day.");}
+function openRentPropertyModal(propertyId=null){
+ if(!isAdmin)return alert("Administrator access required.");const h=propertyId?accountingProperties.find(x=>String(x.id)===String(propertyId)):null;const todayBs=accountingBSDateToday();
+ $("modalTitle").textContent=h?"Edit House Rent Schedule":"Add House / Landlord";$("recordForm").setAttribute("onsubmit","saveRentProperty(event)");$("saveBtn").textContent="Save House Rent Setup";
+ $("formFields").innerHTML=`<input type="hidden" id="rentPropertyId" value="${esc(h?.id||"")}"><div><label>Property / House Name *</label><input id="rentPropertyName" required value="${esc(h?.property_name||"")}"></div><div><label>House Owner Name *</label><input id="rentLandlordName" required value="${esc(h?.landlord_name||"")}"></div><div><label>Owner Contact</label><input id="rentLandlordContact" value="${esc(h?.landlord_contact||"")}"></div><div><label>Monthly Rent (NPR) *</label><input id="rentMonthlyAmount" type="number" min="0.01" step="0.01" required value="${Number(h?.monthly_rent)||""}"></div><div><label>Rent Starting Date (B.S.) *</label>${bsDatePicker("rent_start_date_bs",h?.rent_start_date_bs||todayBs)}</div><div><label>Rent Ending Date (B.S.) · Optional</label><input id="rent_end_date_bs" placeholder="YYYY-MM-DD" value="${esc(h?.rent_end_date_bs||"")}"></div><div><label>Rent Generation Day (1–31)</label><input id="rent_generation_day" type="number" min="1" max="31" value="${Number(h?.rent_generation_day)||1}"></div><div><label>Address</label><input id="rentPropertyAddress" value="${esc(h?.address||"")}"></div><div class="full"><label>Notes</label><textarea id="rentPropertyNotes">${esc(h?.notes||"")}</textarea></div>`;
+ $("recordModal").classList.add("show");
+}
+async function saveRentProperty(e){
+ e.preventDefault();if(!isAdmin)return alert("Administrator access required.");
+ const save=$("saveBtn");if(save.disabled)return;
+ const id=$("rentPropertyId").value||null,f=new FormData($("recordForm")),start=collectBsPicker(f,"rent_start_date_bs"),end=$("rent_end_date_bs").value.trim()||null,day=Number($("rent_generation_day").value)||1;
+ const name=$("rentPropertyName").value.trim(),landlord=$("rentLandlordName").value.trim(),rent=Number($("rentMonthlyAmount").value)||0,address=$("rentPropertyAddress").value.trim();
+ if(!name||!landlord||rent<=0)return alert("Enter property, owner and a monthly rent greater than zero.");
+ if(!validBsDate(start)||(end&&!validBsDate(end)))return alert("Enter valid Nepali B.S. start/end dates.");
+ if(end&&end<start)return alert("Rent end date cannot be before rent start date.");
+ if(day<1||day>31)return alert("Rent generation day must be between 1 and 31.");
+ const norm=v=>String(v||"").trim().replace(/\s+/g," ").toLocaleLowerCase();
+ const duplicate=accountingProperties.find(h=>h.is_active&&String(h.id)!==String(id||"")&&norm(h.property_name)===norm(name)&&norm(h.landlord_name)===norm(landlord)&&norm(h.address)===norm(address));
+ if(duplicate)return alert("Duplicate property detected. This property, owner and address already exist. Please edit the existing house record instead of adding it again.");
+ if(start<accountingBSDateToday()&&!confirm("This past rent start date can generate all missing monthly rent obligations from the selected B.S. month through the current month. Continue?"))return;
+ const payload={property_name:name,landlord_name:landlord,landlord_contact:$("rentLandlordContact").value.trim()||null,monthly_rent:rent,rent_start_date_bs:start,rent_end_date_bs:end,rent_generation_day:day,address,notes:$("rentPropertyNotes").value.trim(),is_active:true,updated_at:new Date().toISOString()};
+ save.disabled=true;save.textContent="Saving…";
+ try{
+  const q=id?sb.from("house_properties").update(payload).eq("id",id):sb.from("house_properties").insert({...payload,property_type:"other",created_by:currentUser?.id||null});
+  const {error}=await q;
+  if(error){if(error.code==="23505")throw new Error("Duplicate property: an active record with the same property name, owner and address already exists.");throw error;}
+  closeModal();await loadRecords();alert("House rent schedule saved. The automatic processor will generate eligible rent obligations.");
+ }catch(err){alert("Could not save house rent setup: "+(err.message||String(err)));}
+ finally{save.disabled=false;save.textContent="Save House Rent Setup";}
+}
+function openStaffLeaveModal(staffKey){if(!isAdmin)return alert("Administrator access required.");const row=records.find(r=>r.record_type==="staff"&&String(r.record_key)===String(staffKey));if(!row)return alert("Staff record not found.");const d=accountingBSDateToday();$("modalTitle").textContent="Record Staff Leave · "+(row.data?.name||"");$("recordForm").setAttribute("onsubmit","saveStaffLeave(event)");$("saveBtn").textContent="Save Leave";$("formFields").innerHTML=`<input type="hidden" id="leaveStaffKey" value="${esc(staffKey)}"><div><label>Leave Start Date (B.S.)</label>${bsDatePicker("leave_start_bs",d)}</div><div><label>Leave End Date (B.S.)</label>${bsDatePicker("leave_end_bs",d)}</div><div><label>Leave Type</label><select id="leaveType"><option value="unpaid">Unpaid Leave · Deduct salary</option><option value="paid">Paid / Approved Leave · No deduction</option></select></div><div class="full"><label>Reason</label><textarea id="leaveReason" placeholder="Reason / approval note"></textarea></div><div class="full formhint">Saturday weekly holidays are excluded from unpaid leave-day deductions. Only approved unpaid leave is deducted at monthly salary ÷ 30.</div>`;$("recordModal").classList.add("show");}
+async function saveStaffLeave(e){e.preventDefault();const key=Number($("leaveStaffKey").value),row=records.find(r=>r.record_type==="staff"&&Number(r.record_key)===key),f=new FormData($("recordForm")),start=collectBsPicker(f,"leave_start_bs"),end=collectBsPicker(f,"leave_end_bs");if(!validBsDate(start)||!validBsDate(end)||end<start)return alert("Enter a valid B.S. leave date range.");const {error}=await sb.from("staff_leave_records").insert({staff_record_key:key,staff_name:row?.data?.name||"Staff",start_date_bs:start,end_date_bs:end,leave_type:$("leaveType").value,approval_status:"approved",reason:$("leaveReason").value.trim()||null,created_by:currentUser?.id||null});if(error)return alert("Could not save leave: "+error.message);closeModal();await loadRecords();alert("Leave saved. Approved unpaid leave will be calculated using the fixed 30-day salary basis when the applicable salary obligation is generated. Existing posted payroll is not overwritten.");}
+function openPartyAdvanceModal(partyType,partyKey){if(!isAdmin)return alert("Administrator access required.");const isStaff=partyType==="employee",partyId=isStaff?records.find(r=>r.record_type==="staff"&&String(r.record_key)===String(partyKey))?.id:partyKey,partyName=isStaff?list("staff").find(x=>String(x.id)===String(partyKey))?.name:accountingProperties.find(x=>String(x.id)===String(partyKey))?.landlord_name;if(!partyId)return alert("Could not find the selected staff member / house owner.");const d=accountingBSDateToday();$("modalTitle").textContent=(isStaff?"Staff Salary Advance · ":"House Rent Advance · ")+partyName;$("recordForm").setAttribute("onsubmit","savePartyAdvance(event)");$("saveBtn").textContent="Record Advance";$("formFields").innerHTML=`<input type="hidden" id="advancePartyType" value="${partyType}"><input type="hidden" id="advancePartyId" value="${esc(partyId)}"><div><label>Advance Date (B.S.)</label>${bsDatePicker("advance_date_bs",d)}</div><div><label>Advance Amount (NPR)</label><input id="advanceAmount" type="number" min="0.01" step="0.01" required></div><div><label>Payment Method</label><select id="advanceMethod"><option>Cash</option><option>Bank</option></select></div><div class="full"><label>Remarks</label><textarea id="advanceRemarks" placeholder="Optional notes"></textarea></div><div class="full notice">Advance is posted separately: DR Employee Advances / Prepaid House Rent, CR Cash / Bank. It will be applied against a future salary or rent obligation without being recorded as a second cash payment.</div>`;$("recordModal").classList.add("show");}
+async function savePartyAdvance(e){e.preventDefault();const f=new FormData($("recordForm")),date=collectBsPicker(f,"advance_date_bs"),amount=Number($("advanceAmount").value)||0,method=$("advanceMethod").value,account=accountingMethodAccount(method);if(!validBsDate(date)||amount<=0)return alert("Enter a valid B.S. date and advance amount.");if(!account)return alert("Configure the selected Cash / Bank account first.");const {data,error}=await sb.rpc("record_party_advance",{p_party_type:$("advancePartyType").value,p_party_id:$("advancePartyId").value,p_amount:amount,p_payment_date_bs:date,p_payment_method:method,p_cash_bank_account_id:account.id,p_remarks:$("advanceRemarks").value.trim()||null});if(error)return alert("Advance could not be posted: "+error.message);const nd=nepaliNow();if(nd){const applied=await sb.rpc("apply_available_advances",{p_bs_year:nd.year,p_bs_month_number:nd.month+1});if(applied.error)console.warn("Advance application:",applied.error.message);}closeModal();await loadRecords();alert("Advance recorded successfully. Voucher and balance are available in the advance ledger.");}
+function openPayrollEditModal(payrollId){
+ if(!isAdmin)return alert("Administrator access required.");
+ const p=accountingPayrollRows.find(x=>String(x.id)===String(payrollId));
+ if(!p)return alert("Salary ledger entry not found. Refresh and try again.");
+ $("modalTitle").textContent=`Edit Salary / Unpaid Leave · ${p.staff_name} · ${p.bs_month_name} ${p.bs_year}`;
+ $("recordForm").setAttribute("onsubmit","savePayrollEdit(event)");
+ $("saveBtn").textContent="Save Salary Changes";
+ $("formFields").innerHTML=`<input type="hidden" id="editPayrollId" value="${esc(p.id)}"><div><label>Staff</label><input value="${esc(p.staff_name)}" disabled></div><div><label>Salary Month (B.S.)</label><input value="${esc(p.bs_month_name)} ${esc(p.bs_year)}" disabled></div><div><label>Monthly Base Salary (NPR)</label><input id="editPayrollBase" type="number" min="0" step="0.01" required value="${Number(p.monthly_base_salary)||0}"></div><div><label>Unpaid Leave Days (this month)</label><input id="editPayrollLeave" type="number" min="0" max="30" step="0.5" required value="${Number(p.leave_days)||0}"></div><div><label>Other Deductions (NPR)</label><input id="editPayrollOther" type="number" min="0" step="0.01" value="${Number(p.other_deductions)||0}"></div><div class="full"><label>Admin Notes</label><textarea id="editPayrollNotes">${esc(p.notes||"")}</textarea></div><div class="full notice">Leave deduction is calculated as monthly salary ÷ 30 × unpaid leave days. This change applies only to this selected B.S. month. Paid salary transactions remain unchanged.</div>`;
+ $("recordModal").classList.add("show");
+}
+async function savePayrollEdit(e){
+ e.preventDefault();if(!isAdmin)return alert("Administrator access required.");
+ const id=$("editPayrollId").value,base=Number($("editPayrollBase").value),leave=Number($("editPayrollLeave").value),other=Number($("editPayrollOther").value)||0,notes=$("editPayrollNotes").value.trim()||null;
+ if(!Number.isFinite(base)||base<0||!Number.isFinite(leave)||leave<0||leave>30||!Number.isFinite(other)||other<0)return alert("Enter valid salary, unpaid leave days (0–30), and deductions.");
+ const {error}=await sb.rpc("admin_edit_staff_payroll",{p_payroll_id:id,p_monthly_base_salary:base,p_leave_days:leave,p_other_deductions:other,p_notes:notes});
+ if(error)return alert("Could not update salary ledger: "+error.message);
+ closeModal();await loadRecords();alert("Salary and monthly unpaid leave days updated successfully.");
+}
+function houseAdvanceActions(propertyId){
+ const rows=accountingAdvances.filter(a=>a.party_type==="landlord"&&String(a.party_id)===String(propertyId));
+ if(!rows.length)return `<small class="muted" style="display:block;margin-top:6px">No house-owner advances recorded.</small>`;
+ return `<div style="margin-top:8px;padding-top:7px;border-top:1px solid #e5eaf1"><strong style="font-size:12px">Advance Records · Admin Edit</strong>${rows.map(a=>{const applied=accountingAdvanceApplications.filter(x=>String(x.advance_id)===String(a.id)).reduce((n,x)=>n+(Number(x.amount)||0),0),balance=Math.max(0,(Number(a.amount)||0)-applied);return `<div style="display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:5px"><small>${esc(a.payment_date_bs||"—")} · ${money(a.amount)} · Balance ${money(balance)}</small><button class="secondary" onclick="openAdvanceEditModal('${esc(a.id)}')">Edit Advance</button></div>`;}).join("")}</div>`;
+}
+function openAdvanceEditModal(advanceId){
+ if(!isAdmin)return alert("Administrator access required.");
+ const a=accountingAdvances.find(x=>String(x.id)===String(advanceId));if(!a)return alert("Advance record not found.");
+ $("modalTitle").textContent="Edit House Rent Advance · "+(a.party_name||"House Owner");
+ $("recordForm").setAttribute("onsubmit","saveAdvanceEdit(event)");$("saveBtn").textContent="Save Advance Changes";
+ $("formFields").innerHTML=`<input type="hidden" id="editAdvanceId" value="${esc(a.id)}"><div><label>House Owner</label><input value="${esc(a.party_name||"")}" disabled></div><div><label>Advance Date (B.S.)</label>${bsDatePicker("edit_advance_date_bs",a.payment_date_bs||accountingBSDateToday())}</div><div><label>Advance Amount (NPR)</label><input id="editAdvanceAmount" type="number" min="0.01" step="0.01" required value="${Number(a.amount)||0}"></div><div class="full"><label>Remarks</label><textarea id="editAdvanceRemarks">${esc(a.remarks||"")}</textarea></div><div class="full notice">The advance cannot be reduced below the amount already applied to rent. The accounting voucher and remaining advance balance will update together.</div>`;
+ $("recordModal").classList.add("show");
+}
+async function saveAdvanceEdit(e){
+ e.preventDefault();if(!isAdmin)return alert("Administrator access required.");
+ const id=$("editAdvanceId").value,date=collectBsPicker(new FormData($("recordForm")),"edit_advance_date_bs"),amount=Number($("editAdvanceAmount").value),remarks=$("editAdvanceRemarks").value.trim()||null;
+ if(!validBsDate(date)||!Number.isFinite(amount)||amount<=0)return alert("Enter a valid B.S. date and advance amount.");
+ const {error}=await sb.rpc("admin_update_accounting_advance",{p_advance_id:id,p_amount:amount,p_payment_date_bs:date,p_remarks:remarks});
+ if(error)return alert("Could not update house-rent advance: "+error.message);
+ closeModal();await loadRecords();alert("House-rent advance updated successfully.");
+}
+async function processNepaliMonthlyNow(){if(!isAdmin)return alert("Administrator access required.");const {data,error}=await sb.rpc("process_nepali_monthly_obligations");if(error)return alert("Nepali month processing failed: "+error.message);await loadRecords();alert(`Nepali monthly processing complete.\nSalary entries created: ${data?.staff_entries_created||0}\nRent entries created: ${data?.rent_entries_created||0}\nAdvance applications: ${data?.advance_applications_created||0}`);}
+function renderPrivateLedgerPage(type,selectedValue=""){
+ const salary=type==="salary",items=list(type),title=salary?"Staff-wise Salary Ledger":"Property-wise House Rent Ledger";
+ const options=salary?list("staff").map(x=>({value:String(x.id),label:x.name})):accountingProperties.map(x=>({value:String(x.id),label:`${x.property_name} · ${x.landlord_name}`}));
+ const filterId=salary?"privateStaffFilter":"privatePropertyFilter",selected=selectedValue||$(filterId)?.value||"";
+ const filtered=items.filter(x=>!selected||(salary?String(x.staff_id)===selected:String(accountingRentRows.find(l=>String(l.id)===String(x.id))?.property_id||"")===selected));
+ const total=filtered.reduce((n,x)=>n+(salary?Math.max(0,(Number(x.base_salary)||0)-(Number(x.leave_deduction)||0)):(Number(x.monthly_rent)||0)),0),due=filtered.reduce((n,x)=>n+(salary?Number(x.net_payable)||0:Number(x.due_amount)||0),0);
+ const filter=`<label style="margin:0;min-width:240px">${salary?"Select staff member":"Select property / house"}<select id="${filterId}" onchange="filterPrivateLedger('${type}')"><option value="">All ${salary?"staff":"properties"}</option>${options.map(o=>`<option value="${esc(o.value)}" ${selected===o.value?"selected":""}>${esc(o.label)}</option>`).join("")}</select></label>`;
+ const settings=salary?`<div class="panel"><div class="toolbar"><div><strong>Staff Salary Schedule & Leave Management</strong><div class="formhint">Set joining/start/end dates and generation day using B.S. dates. Record paid and unpaid leave separately.</div></div><div class="actions"><button class="secondary" onclick="processNepaliMonthlyNow()">Process BS Months Now</button></div></div><div class="tablewrap"><table><thead><tr><th>Staff</th><th>Monthly Salary</th><th>Joining (BS)</th><th>Salary Start (BS)</th><th>End Date</th><th>Generation Day</th><th>Unpaid Leave Days</th><th>Advance Paid</th><th>Advance Applied</th><th>Advance Balance</th><th>Actions</th></tr></thead><tbody>${list("staff").map(st=>{const cfg=staffPayrollSettings.find(x=>String(x.staff_record_key)===String(st.id))||{},uuid=records.find(r=>r.record_type==="staff"&&String(r.record_key)===String(st.id))?.id,leaveDays=accountingPayrollRows.filter(p=>String(p.staff_record_key)===String(st.id)).reduce((n,p)=>n+(Number(p.leave_days)||0),0),adv=uuid?partyAdvanceSummary("salary",uuid):{total:0,applied:0,remaining:0};return `<tr><td>${esc(st.name)}</td><td>${money(st.salary)}</td><td>${esc(cfg.joining_date_bs||st.joined_bs||"—")}</td><td>${esc(cfg.salary_start_date_bs||"Not configured")}</td><td>${esc(cfg.salary_end_date_bs||"Ongoing")}</td><td>${Number(cfg.salary_generation_day)||1}</td><td>${leaveDays}</td><td>${money(adv.total)}</td><td>${money(adv.applied)}</td><td>${money(adv.remaining)}</td><td><div class="actions"><button class="secondary" onclick="openPayrollSettings('${esc(st.id)}')">Schedule</button><button class="secondary" onclick="openStaffLeaveModal('${esc(st.id)}')">Leave</button><button class="secondary" onclick="openPartyAdvanceModal('employee','${esc(st.id)}')">Advance</button></div></td></tr>`;}).join("")||`<tr><td colspan="11" class="empty">No staff registered.</td></tr>`}</tbody></table></div><div class="formhint">Only approved unpaid leave is deducted. Saturdays are excluded. Salary is calculated as monthly salary ÷ 30, regardless of actual B.S. month length.</div><h4>Recorded Staff Leave</h4><div class="tablewrap"><table><thead><tr><th>Staff</th><th>From (BS)</th><th>To (BS)</th><th>Leave Type</th><th>Approval</th><th>Reason</th></tr></thead><tbody>${staffLeaveRecords.map(l=>`<tr><td>${esc(l.staff_name)}</td><td>${esc(l.start_date_bs)}</td><td>${esc(l.end_date_bs)}</td><td>${esc(l.leave_type)}</td><td>${esc(l.approval_status)}</td><td>${esc(l.reason||"—")}</td></tr>`).join("")||`<tr><td colspan="6" class="empty">No leave records yet.</td></tr>`}</tbody></table></div></div>`:`<div class="panel"><div class="toolbar"><div><strong>House Owner / Rental Agreement Management</strong><div class="formhint">Rent starts only after a B.S. start date is configured. Changing a rent rate does not alter old monthly obligations. Duplicate active property / owner / address entries are blocked.</div></div><div class="actions"><button class="secondary" onclick="processNepaliMonthlyNow()">Process BS Months Now</button><button onclick="openRentPropertyModal()">＋ Add House / Owner</button></div></div><label style="display:flex;align-items:center;gap:8px;font-weight:500;margin:0 0 10px"><input type="checkbox" style="width:auto" ${showInactiveRentProperties?"checked":""} onchange="showInactiveRentProperties=this.checked;renderPrivateLedgerPage('house_rent')"> Show archived / inactive properties</label><div class="tablewrap"><table><thead><tr><th>Property</th><th>House Owner</th><th>Monthly Rent</th><th>Start Date (BS)</th><th>End Date</th><th>Generation Day</th><th>Advance Paid</th><th>Advance Applied</th><th>Advance Balance</th><th>Actions</th></tr></thead><tbody>${accountingProperties.filter(h=>showInactiveRentProperties||h.is_active).map(h=>`<tr><td>${esc(h.property_name)}${h.is_active?"":`<small class="muted" style="display:block">Archived / inactive · Rent generation stopped</small>`}</td><td>${esc(h.landlord_name)}<small class="muted" style="display:block">${esc(h.landlord_contact||"")}</small></td><td>${h.is_active?money(h.monthly_rent):"—"}</td><td>${h.is_active?esc(h.rent_start_date_bs||"Not configured"):"—"}</td><td>${h.is_active?esc(h.rent_end_date_bs||"Ongoing"):"—"}</td><td>${h.is_active?(Number(h.rent_generation_day)||1):"—"}</td><td>${money(partyAdvanceSummary("house_rent",h.id).total)}</td><td>${money(partyAdvanceSummary("house_rent",h.id).applied)}</td><td>${money(partyAdvanceSummary("house_rent",h.id).remaining)}</td><td><div class="actions"><button class="secondary" onclick="openRentPropertyModal('${esc(h.id)}')">${h.is_active?"Edit Schedule":"Reactivate / Schedule"}</button><button class="secondary" onclick="openPartyAdvanceModal('landlord','${esc(h.id)}')">Add Advance</button></div>${houseAdvanceActions(h.id)}</td></tr>`).join("")||`<tr><td colspan="10" class="empty">No active house / landlord registered.</td></tr>`}</tbody></table></div></div>`;
+ const subtitle=salary?"Confidential staff-wise salary, leave, advance and monthly DR/CR history · Admin only":"House-owner-wise rent, advance and monthly DR/CR history · Admin only";
+ const partyLedger=selected?renderPartyLedger(type,selected):`<div class="panel empty">Select one ${salary?"staff member":"property"} above to view the individual DR/CR statement.</div>`;
+ const lastPeriod=accountingPeriods[accountingPeriods.length-1],calendarCoverage=lastPeriod?`Configured B.S. calendar periods currently extend through ${lastPeriod.month_name} ${lastPeriod.bs_year}. Add the next official B.S. month periods before this coverage ends.`:"No B.S. month periods are configured.";
+ $("page").innerHTML=`<div class="pagehead"><div><h2>${title}</h2><p>${subtitle}</p></div></div><div class="notice">Nepali Bikram Sambat is the primary period system. Monthly obligations are generated by the database scheduler using configured B.S. periods. DR records expense obligations; CR records actual payments and advance applications. Unapplied advances remain separate asset balances. <strong>${esc(calendarCoverage)}</strong></div>${settings}<div class="panel"><div class="toolbar">${filter}<span class="muted">${filtered.length} ${salary?"salary entries":"rent obligations"}</span></div><div class="cards"><div class="stat"><small>${salary?"Total Salary Accrued":"Total Rent Accrued"}</small><strong>${money(total)}</strong></div><div class="stat"><small>${salary?"Outstanding Salary":"Outstanding Rent"}</small><strong>${money(due)}</strong></div><div class="stat"><small>${salary?"Staff Members":"Properties"}</small><strong>${new Set(filtered.map(x=>salary?String(x.staff_id):String(x.property_name))).size}</strong></div><div class="stat"><small>${salary?"Unapplied Staff Advances":"Unapplied House Owner Advances"}</small><strong>${money((salary?accountingAdvances.filter(a=>a.party_type==="employee"):accountingAdvances.filter(a=>a.party_type==="landlord")).reduce((sum,a)=>sum+Math.max(0,Number(a.amount||0)-accountingAdvanceApplications.filter(z=>String(z.advance_id)===String(a.id)).reduce((v,z)=>v+Number(z.amount||0),0)),0))}</strong></div></div><div id="privateLedgerTable">${tableHTML(type,filtered)}</div></div><div id="individualPartyLedger">${partyLedger}</div>`;
+}
+function filterPrivateLedger(type){const selected=$(type==="salary"?"privateStaffFilter":"privatePropertyFilter")?.value||"";renderPrivateLedgerPage(type,selected);}
+function fieldLabel(cfg,key){if(key==="student")return "Student Name";if(key==="student_status")return "Application Status";if(key==="paid")return "Paid";if(key==="due")return "Remaining Due";if(key==="staff_name")return "Staff";if(key==="leave_deduction")return "Leave Deduction";if(key==="net_payable")return "Net Payable";if(key==="due_amount")return "Due Amount";const f=cfg.fields.find(x=>x[0]===key);return f?f[1]:key;}
+function contactLinks(type,item){const phone=item.phone;if(!phone)return "";const num=String(phone).replace(/[^+0-9]/g,"");const digits=String(num).replace(/\D/g,"");const wa=digits.startsWith("977")?digits:(digits.length===10?"977"+digits:digits);
+return `<div class="contact-links"><a href="tel:${esc(num)}" onclick="contactAction(event,'${type}',${Number(item.id)},'call',this.href)">Call</a><a href="sms:${esc(num)}" onclick="contactAction(event,'${type}',${Number(item.id)},'sms',this.href)">SMS</a><a href="https://wa.me/${esc(wa)}" target="_blank" rel="noopener">WhatsApp</a></div>`;}
+function tableHTML(type,items){const cfg=modules[type];if(!items.length)return `<div class="empty">${["salary","house_rent"].includes(type)?"No matching accounting ledger records were found.":`No ${cfg.title.toLowerCase()} records yet. Click “Add ${cfg.singular}” to create one.`}</div>`;const cols=cfg.cols.filter(c=>!(type==="staff"&&c==="salary"&&!isAdmin));return `<div class="tablewrap"><table><thead><tr>${cols.map(c=>`<th>${esc(fieldLabel(cfg,c))}</th>`).join("")}<th>Contact</th><th>Actions</th></tr></thead><tbody>${items.map(item=>`<tr>${cols.map(c=>{let val=item[c]??"—";if(c==="paid")val=money(type==="visa"?item.paid_amount:paidFor(item));if(c==="due")val=money(type==="visa"?item.remaining_due:dueFor(item));if(["total_fee","salary","base_salary","leave_deduction","advance","previous_received","other_deductions","net_payable","monthly_rent","paid_amount","due_amount"].includes(c))val=money(item[c]);if(c==="status")return `<td><span class="pill">${esc(val)}</span></td>`;if(c==="due"&&dueFor(item)>0&&item.followup&&item.followup<=today())return `<td class="due">${esc(val)}</td>`;return `<td>${esc(val)}</td>`;}).join("")}<td>${["students","leads","visa","staff"].includes(type)?contactLinks(type,item):type==="house_rent"&&item.landlord_contact?`<a href="tel:${esc(item.landlord_contact)}">Call landlord</a>`:"—"}</td><td><div class="actions"><!-- history is intentionally admin-only -->${type==="staff"?`<button class="secondary" onclick="viewStaffProfile(${Number(item.id)})">Profile</button>`:""}${isAdmin&&!["salary","house_rent"].includes(type)?`<button class="secondary" onclick="showActivity('${type}',${Number(item.id)})">History</button>`:""}${(isAdmin||["students","leads"].includes(type))&&["students","leads","visa"].includes(type)?`<button class="secondary" onclick="updateStatus('${type}',${Number(item.id)})">Status</button>`:""}${(isAdmin||["students","leads","payments"].includes(type))?`<button class="secondary" onclick="openModal('${type}',${Number(item.id)})">Edit</button>`:""}${type==="salary"&&isAdmin?`<button class="secondary" onclick="openPayrollEditModal('${esc(item.id)}')">Edit Salary / Leave</button>`:""}${type==="salary"?`<button class="secondary" onclick="printSalarySlip('${esc(item.id)}')">Print / PDF</button>`:""}${type==="house_rent"?`<button class="secondary" onclick="printRentSlip('${esc(item.id)}')">Print / PDF</button>`:""}${type==="leads"?`<button class="secondary" onclick="openInquiryReply(${Number(item.id)})">Reply</button>`:""}${isAdmin&&!["salary","house_rent"].includes(type)?`<button class="danger" onclick="deleteRecord('${type}',${Number(item.id)})">Delete</button>`:""}</div></td></tr>`).join("")}</tbody></table></div>`;}
+function filterTable(type){const q=$ ("searchBox").value.toLowerCase();$ ("tableArea").innerHTML=tableHTML(type,list(type).filter(x=>JSON.stringify(x).toLowerCase().includes(q)));}
+function openModal(type,id=null){if(type==="expenses")return openExpenditureEntryModal();if(type==="salary"||type==="house_rent")return alert("Salary and rent obligations are managed in the connected accounting ledgers. Record payments from Expenditure Ledger.");$("recordForm").setAttribute("onsubmit","saveRecord(event)");if(id&&!isAdmin&&!["students","leads","payments"].includes(type)){alert("Staff can edit only student, lead and payment records.");return;}editing={type,id};const cfg=modules[type],item=id?list(type).find(x=>Number(x.id)===Number(id)):{ };$ ("modalTitle").textContent=(id?"Edit ":"Add ")+cfg.singular;$ ("formFields").innerHTML=cfg.fields.map(f=>{const [key,label,kind,required,options]=f;let val=item?.[key]??"",control="";if(kind==="staff"){control=`<select name="staff_id" required><option value="">Select staff member</option>${list("staff").map(st=>`<option value="${Number(st.id)}" ${Number(val)===Number(st.id)?"selected":""}>${esc(st.name)} (ID ${Number(st.id)})</option>`).join("")}</select>`;}else if(kind==="bsdate"){control=bsDatePicker(key,val);}else if(kind==="student"){control=`<select name="student_id" required><option value="">Select student</option>${students().map(s=>`<option value="${Number(s.id)}" ${Number(val)===Number(s.id)?"selected":""}>${esc(s.name)} (ID ${Number(s.id)})</option>`).join("")}</select>`;}else if(kind==="select")control=`<select name="${key}">${(options||[]).map(o=>`<option value="${esc(o)}" ${String(val)===o?"selected":""}>${esc(o)}</option>`).join("")}</select>`;else if(kind==="textarea")control=`<textarea name="${key}">${esc(val)}</textarea>`;else control=`<input name="${key}" type="${kind}" value="${esc(val)}" ${required?"required":""} ${kind==="number"?'min="0" step="0.01"':""}>`;return `<div class="${kind==="textarea"?"full":""}"><label>${esc(label)}${required?" *":""}</label>${control}</div>`;}).join("");$ ("recordModal").classList.add("show");}
+function closeModal(){$ ("recordModal").classList.remove("show");editing=null;activityContext=null;}
+
+function accountingBSDateToday(){
+ const nd=nepaliNow();
+ return nd?`${nd.year}-${String(nd.month+1).padStart(2,"0")}-${String(nd.day).padStart(2,"0")}`:"2083-08-01";
+}
+function accountingBSDateToAD(value){
+ const parts=String(value||"").split("-").map(Number);
+ if(parts.length!==3||parts.some(x=>!Number.isFinite(x)))return null;
+ const period=accountingPeriods.find(x=>Number(x.bs_year)===parts[0]&&Number(x.month_number)===parts[1]);
+ if(!period||parts[2]<1||parts[2]>32)return null;
+ const d=new Date(`${period.start_ad_date}T00:00:00Z`);
+ d.setUTCDate(d.getUTCDate()+parts[2]-1);
+ return d.toISOString().slice(0,10);
+}
+function accountingMethodAccount(method){
+ const code=method==="Bank"?"1010":"1000";
+ return accountingAccounts.find(a=>a.account_code===code&&a.is_cash_bank&&a.is_active);
+}
+function showExpenseTab(tab){expenseTab=tab;renderAccountingExpenditurePage();}
+function filteredAccountingRows(){
+ const from=$("daybookFrom")?.value.trim()||"",to=$("daybookTo")?.value.trim()||"",category=$("daybookCategory")?.value||"",method=$("daybookMethod")?.value||"",q=($("daybookSearch")?.value||"").toLowerCase();
+ return accountingDayRows.filter(r=>{
+  if(!isAdmin&&(String(r.source_type||"").match(/salary|rent/i)||String(r.category||"").match(/salary|rent/i)))return false;
+  if(from&&r.date_bs&&r.date_bs<from)return false;
+  if(to&&r.date_bs&&r.date_bs>to)return false;
+  if(category&&r.category!==category)return false;
+  if(method&&r.payment_method!==method)return false;
+  if(q&&!`${r.voucher_no||""} ${r.particulars||""} ${r.party_name||""} ${r.category||""}`.toLowerCase().includes(q))return false;
+  if(expenseTab==="register"&&!(Number(r.expense_amount)>0||Number(r.cash_out)>0))return false;
+  return true;
+ }).sort((a,b)=>String(b.date_bs||b.date_ad||"").localeCompare(String(a.date_bs||a.date_ad||""))||String(b.created_at||"").localeCompare(String(a.created_at||"")));
+}
+function accountingTotals(rows){
+ return rows.reduce((t,r)=>{
+  t.income+=Number(r.income_amount)||0;t.expense+=Number(r.expense_amount)||0;
+  const method=r.payment_method;
+  if(method==="Cash"){t.cashIn+=Number(r.cash_in)||0;t.cashOut+=Number(r.cash_out)||0;}
+  if(method==="Bank"){t.bankIn+=Number(r.cash_in)||0;t.bankOut+=Number(r.cash_out)||0;}
+  return t;
+ },{income:0,expense:0,cashIn:0,cashOut:0,bankIn:0,bankOut:0});
+}
+function accountingCashBankSnapshot(rows,day){
+ const cash=accountingAccounts.find(a=>a.account_code==="1000"),bank=accountingAccounts.find(a=>a.account_code==="1010");
+ const openingCash=Number(cash?.opening_balance)||0,openingBank=Number(bank?.opening_balance)||0;
+ const prior=rows.filter(r=>r.date_bs&&r.date_bs<day);
+ const todayRows=rows.filter(r=>r.date_bs===day);
+ const before=accountingTotals(prior),today=accountingTotals(todayRows);
+ return {
+  openingCash:openingCash+before.cashIn-before.cashOut,
+  openingBank:openingBank+before.bankIn-before.bankOut,
+  receiptsCash:today.cashIn,receiptsBank:today.bankIn,
+  paymentsCash:today.cashOut,paymentsBank:today.bankOut,
+  closingCash:openingCash+before.cashIn-before.cashOut+today.cashIn-today.cashOut,
+  closingBank:openingBank+before.bankIn-before.bankOut+today.bankIn-today.bankOut
+ };
+}
+function renderAccountingExpenditurePage(){
+ const savedFilters={from:$("daybookFrom")?.value||"",to:$("daybookTo")?.value||"",category:$("daybookCategory")?.value||"",method:$("daybookMethod")?.value||"",search:$("daybookSearch")?.value||""};
+ const all=filteredAccountingRows(),totals=accountingTotals(all);
+ const selectedDay=$("daybookFrom")?.value.trim()||accountingBSDateToday();
+ const snap=accountingCashBankSnapshot(accountingDayRows,selectedDay);
+ const cats=[...new Set(accountingDayRows.map(r=>r.category).filter(Boolean))].sort();
+ if(expenseTab==="utilities"){
+  const utilityRows=accountingUtilityBills.map(b=>`<tr><td>${esc(b.bill_date_bs||"—")}</td><td>${esc(b.voucher_no||"—")}</td><td>${esc(b.utility_type||"")} · ${esc(b.provider_name||"")}<small class="muted" style="display:block">Meter: ${esc(b.meter_number||"—")}</small></td><td class="num">${Number(b.previous_reading).toLocaleString("en-IN")}</td><td class="num">${Number(b.current_reading).toLocaleString("en-IN")}</td><td class="num">${Number(b.consumed_units).toLocaleString("en-IN")}</td><td class="num">${money(b.rate_per_unit)}</td><td class="num">${money(b.bill_amount)}</td><td>${esc(b.payment_method||"—")}</td><td><button class="secondary" onclick="printAccountingVoucher('journal:${esc(b.journal_entry_id||"")}')">Print</button></td></tr>`).join("")||`<tr><td colspan="10" class="empty">No utility bills recorded yet.</td></tr>`;
+  $("page").innerHTML=`<div class="pagehead"><div><h2>Utility Bill Management</h2><p>Record meter readings, calculate consumption and post paid bills to the accounting ledger.</p></div><button onclick="openUtilityBillModal()">＋ Add Utility Bill</button></div>
+   <div class="subnav"><button class="secondary" onclick="showExpenseTab('daybook')">Day Book</button><button class="secondary" onclick="showExpenseTab('register')">Expenditure Register</button><button onclick="showExpenseTab('utilities')">Utility Bills</button></div>
+   <div class="cards"><div class="stat"><small>Total Bills</small><strong>${accountingUtilityBills.length}</strong></div><div class="stat"><small>Total Utility Expense</small><strong>${money(accountingUtilityBills.reduce((n,b)=>n+(Number(b.bill_amount)||0),0))}</strong></div><div class="stat"><small>Accounting Head</small><strong>5120 · Utilities</strong></div></div>
+   <div class="panel"><h3 style="margin-top:0;color:#102b52">Utility Bill Register</h3><div class="tablewrap"><table style="min-width:1050px"><thead><tr><th>Date (B.S.)</th><th>Voucher</th><th>Utility / Provider</th><th>Old Reading</th><th>New Reading</th><th>Units</th><th>Rate / Unit</th><th>Bill Amount</th><th>Paid By</th><th>Voucher</th></tr></thead><tbody>${utilityRows}</tbody></table></div><div class="notice" style="margin-top:12px">Each saved bill posts one balanced journal: Dr Utilities Expense (5120) and Cr Cash / Bank. The same posted entry appears in the Day Book and Expenditure Register.</div></div>`;
+  return;
+ }
+ const rowsHtml=all.length?(()=>{
+  const groups=new Map();
+  for(const r of all){const key=r.date_bs||r.date_ad||"Date not recorded";if(!groups.has(key))groups.set(key,[]);groups.get(key).push(r);}
+  return [...groups.entries()].map(([day,items])=>{
+   const t=accountingTotals(items);
+   const rows=items.map(r=>{
+    const posted=r.is_journal_posted?`<span class="pill">Posted</span>`:`<span class="pill">Legacy record</span>`;
+    const adminActions=isAdmin&&r.source_type==="legacy_expense"?`<button class="secondary" onclick="adminEditLegacyExpense('${esc(r.source_id)}')">Edit</button><button class="danger" onclick="adminDeleteLegacyExpense('${esc(r.source_id)}')">Delete</button>`:isAdmin&&["expense_voucher","manual_expense"].includes(r.source_type)&&r.journal_entry_id?`<button class="secondary" onclick="adminEditExpenditure('${esc(r.journal_entry_id)}','${esc(r.date_bs||"")}','${esc(r.particulars||"")}',${Number(r.expense_amount)||Number(r.cash_out)||Number(r.debit_total)||0})">Edit</button><button class="danger" onclick="adminDeleteExpenditure('${esc(r.journal_entry_id)}')">Delete</button>`:"—";
+    return `<tr><td>${esc(r.date_bs||r.date_ad||"—")}</td><td>${esc(r.voucher_no||"—")}</td><td>${esc(r.particulars||"—")}<small class="muted" style="display:block">${esc(r.party_name||"")}</small></td><td>${esc(r.category||"—")}</td><td class="num">${Number(r.income_amount)?money(r.income_amount):"—"}</td><td class="num">${Number(r.expense_amount)?money(r.expense_amount):"—"}</td><td class="num">${Number(r.debit_total)?money(r.debit_total):"—"}</td><td class="num">${Number(r.credit_total)?money(r.credit_total):"—"}</td><td>${esc(r.payment_method||"—")}</td><td>${posted}</td><td><button class="secondary" onclick="printAccountingVoucher('${esc(r.transaction_id)}')">Print</button></td><td><div class="actions">${adminActions}</div></td></tr>`;
+   }).join("");
+   return `<tr class="day-group"><td colspan="12"><strong>${esc(day)}</strong><span style="float:right">Income ${money(t.income)} · Expense ${money(t.expense)} · Cash/Bank In ${money(t.cashIn+t.bankIn)} · Out ${money(t.cashOut+t.bankOut)}</span></td></tr>${rows}`;
+  }).join("");
+ })():`<tr><td colspan="12" class="empty">No transactions match these filters.</td></tr>`;
+ const registerRows=all.map(r=>`<tr><td>${esc(r.date_bs||r.date_ad||"—")}</td><td>${esc(r.voucher_no||"—")}</td><td>${esc(r.particulars||"—")}</td><td>${esc(r.category||"—")}</td><td>${esc(r.party_name||"—")}</td><td>${money(Number(r.expense_amount)||Number(r.cash_out)||0)}</td><td>${esc(r.payment_method||"—")}</td><td>${isAdmin&&r.source_type==="legacy_expense"?`<div class="actions"><button class="secondary" onclick="adminEditLegacyExpense('${esc(r.source_id)}')">Edit</button><button class="danger" onclick="adminDeleteLegacyExpense('${esc(r.source_id)}')">Delete</button></div>`:isAdmin&&["expense_voucher","manual_expense"].includes(r.source_type)&&r.journal_entry_id?`<div class="actions"><button class="secondary" onclick="adminEditExpenditure('${esc(r.journal_entry_id)}','${esc(r.date_bs||"")}','${esc(r.particulars||"")}',${Number(r.expense_amount)||Number(r.cash_out)||Number(r.debit_total)||0})">Edit</button><button class="danger" onclick="adminDeleteExpenditure('${esc(r.journal_entry_id)}')">Delete</button></div>`:"—"}</td></tr>`).join("")||`<tr><td colspan="8" class="empty">No expenditure records match these filters.</td></tr>`;
+ $("page").innerHTML=`<div class="pagehead"><div><h2>Expenditure Ledger</h2><p>Daily income, expenditure, salary, house rent and cash/bank movement</p></div><button onclick="openExpenditureEntryModal()">＋ Add Expenditure / Payment</button></div>
+ <div class="subnav"><button class="${expenseTab==="daybook"?"":"secondary"}" onclick="showExpenseTab('daybook')">Day Book</button><button class="${expenseTab==="register"?"":"secondary"}" onclick="showExpenseTab('register')">Expenditure Register</button><button class="${expenseTab==="utilities"?"":"secondary"}" onclick="showExpenseTab('utilities')">Utility Bills</button></div>
+ <div class="cards">
+  <div class="stat"><small>Total Income</small><strong>${money(totals.income)}</strong></div>
+  <div class="stat"><small>Expense Accrued</small><strong>${money(totals.expense)}</strong></div>
+  <div class="stat"><small>Cash / Bank Received</small><strong>${money(totals.cashIn+totals.bankIn)}</strong></div>
+  <div class="stat"><small>Cash / Bank Paid</small><strong>${money(totals.cashOut+totals.bankOut)}</strong></div>
+ </div>
+ <div class="panel">
+  <h3 style="margin-top:0;color:#102b52">Daily Cash & Bank Position · ${esc(selectedDay)}</h3>
+  <div class="tablewrap"><table style="min-width:600px"><thead><tr><th>Particulars</th><th>Cash (NPR)</th><th>Bank (NPR)</th></tr></thead><tbody>
+   <tr><td>Opening Balance</td><td>${money(snap.openingCash)}</td><td>${money(snap.openingBank)}</td></tr>
+   <tr><td>Total Receipts</td><td>${money(snap.receiptsCash)}</td><td>${money(snap.receiptsBank)}</td></tr>
+   <tr><td>Total Payments</td><td>${money(snap.paymentsCash)}</td><td>${money(snap.paymentsBank)}</td></tr>
+   <tr><th>Closing Balance</th><th>${money(snap.closingCash)}</th><th>${money(snap.closingBank)}</th></tr>
+  </tbody></table></div>
+ </div>
+ <div class="panel">
+  <div class="toolbar" style="flex-wrap:wrap">
+   <input id="daybookFrom" placeholder="From B.S. YYYY-MM-DD" onchange="renderAccountingExpenditurePage()" style="max-width:190px">
+   <input id="daybookTo" placeholder="To B.S. YYYY-MM-DD" onchange="renderAccountingExpenditurePage()" style="max-width:190px">
+   <select id="daybookCategory" onchange="renderAccountingExpenditurePage()" style="max-width:190px"><option value="">All Categories</option>${cats.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join("")}</select>
+   <select id="daybookMethod" onchange="renderAccountingExpenditurePage()" style="max-width:150px"><option value="">Cash & Bank</option><option>Cash</option><option>Bank</option><option>Online</option><option>Other</option></select>
+   <input id="daybookSearch" placeholder="Search payee / voucher…" onchange="renderAccountingExpenditurePage()" style="max-width:220px">
+  </div>
+  <div class="actions" style="margin-bottom:12px"><button class="secondary" onclick="printAccountingDayBook()">Print / Save PDF</button><button class="secondary" onclick="exportAccountingDayBookCSV()">Export CSV</button><span class="muted">${all.length} transaction(s)</span></div>
+  ${expenseTab==="daybook"?`<div class="tablewrap"><table style="min-width:1050px"><thead><tr><th>Date (B.S.)</th><th>Voucher No.</th><th>Particulars / Payee</th><th>Category</th><th>Income</th><th>Expense</th><th>DR</th><th>CR</th><th>Method</th><th>Source</th><th>Voucher</th><th>Admin Actions</th></tr></thead><tbody>${rowsHtml}</tbody></table></div>`:`<div class="tablewrap"><table style="min-width:800px"><thead><tr><th>Date (B.S.)</th><th>Voucher No.</th><th>Particulars</th><th>Category</th><th>Payee</th><th>Expenditure</th><th>Method</th><th>Admin Actions</th></tr></thead><tbody>${registerRows}</tbody></table></div>`}
+ </div>
+ <div class="notice">Salary and rent payments are posted through the existing payroll/rent ledgers and appear here from the accounting journal. Student receipts and existing manual expenditure records are included from EMC records. Journal-posted transactions appear once.</div>`;
+ $("daybookFrom").value=savedFilters.from;$("daybookTo").value=savedFilters.to;$("daybookCategory").value=savedFilters.category;$("daybookMethod").value=savedFilters.method;$("daybookSearch").value=savedFilters.search;
+}
+
+
+async function adminEditLegacyExpense(sourceId){
+ if(!isAdmin)return alert("Administrator access required.");
+ const row=records.find(x=>String(x.id)===String(sourceId)&&x.record_type==="expenses");
+ if(!row)return alert("Legacy expenditure record was not found. Refresh and try again.");
+ const d=row.data||{},dateBs=d.date_bs||"";
+ const nextDate=prompt("Edit payment date (B.S. YYYY-MM-DD):",dateBs||accountingBSDateToday());if(nextDate===null)return;
+ if(!validBsDate(nextDate))return alert("Enter a valid Nepali B.S. date.");
+ const ad=accountingBSDateToAD(nextDate);if(!ad)return alert("This B.S. date is not configured in the Nepali month calendar.");
+ const title=prompt("Edit expense title:",d.title||"");if(title===null)return;
+ const payee=prompt("Edit payee / item name:",d.payee_name||"");if(payee===null)return;
+ const amount=Number(prompt("Edit expenditure amount (NPR):",String(d.amount||0)));if(!Number.isFinite(amount)||amount<=0)return alert("Enter an amount greater than zero.");
+ if(!confirm("Save changes to this legacy expenditure record?"))return;
+ const {error}=await sb.from(TABLE).update({data:{...d,title:title.trim(),payee_name:payee.trim(),amount,date:ad,date_bs:nextDate}}).eq("id",sourceId).eq("record_type","expenses");
+ if(error)return alert("Could not edit expenditure: "+error.message);
+ await loadRecords();alert("Expenditure updated successfully.");
+}
+async function adminDeleteLegacyExpense(sourceId){
+ if(!isAdmin)return alert("Administrator access required.");
+ if(!confirm("Delete this legacy expenditure record? This action cannot be undone."))return;
+ const {error}=await sb.from(TABLE).delete().eq("id",sourceId).eq("record_type","expenses");
+ if(error)return alert("Could not delete expenditure: "+error.message);
+ await loadRecords();alert("Expenditure deleted successfully.");
+}
+
+async function adminEditExpenditure(entryId,dateBs,particulars,amount){
+ if(!isAdmin)return alert("Administrator access required.");
+ if(!entryId||entryId==="undefined")return alert("This legacy expenditure record cannot be edited from the accounting journal.");
+ const nextDate=prompt("Edit date (B.S. YYYY-MM-DD):",dateBs||accountingBSDateToday());if(nextDate===null)return;
+ if(!validBsDate(nextDate))return alert("Enter a valid Nepali B.S. date.");
+ const nextParticulars=prompt("Edit expenditure particulars:",particulars||"");if(nextParticulars===null)return;
+ if(!nextParticulars.trim())return alert("Particulars are required.");
+ const nextAmount=Number(prompt("Edit expenditure amount (NPR):",String(amount||0)));if(!Number.isFinite(nextAmount)||nextAmount<=0)return alert("Enter an amount greater than zero.");
+ if(!confirm("Save these changes to this manual expenditure voucher?"))return;
+ const {error}=await sb.rpc("admin_edit_expenditure",{p_entry_id:entryId,p_date_bs:nextDate,p_particulars:nextParticulars.trim(),p_amount:nextAmount});
+ if(error)return alert("Could not edit expenditure: "+error.message);
+ await loadRecords();alert("Expenditure voucher updated successfully.");
+}
+async function adminDeleteExpenditure(entryId){
+ if(!isAdmin)return alert("Administrator access required.");
+ if(!entryId||entryId==="undefined")return alert("This legacy expenditure record cannot be deleted from the accounting journal.");
+ if(!confirm("Delete this manual expenditure voucher and its accounting lines? This action cannot be undone."))return;
+ const {error}=await sb.from("accounting_journal_entries").delete().eq("id",entryId);
+ if(error)return alert("Could not delete expenditure: "+error.message);
+ await loadRecords();alert("Expenditure voucher deleted successfully.");
+}
+
+async function printAccountingVoucher(transactionId){
+ const r=accountingDayRows.find(x=>String(x.transaction_id)===String(transactionId));if(!r)return alert("Voucher record not found.");
+ const w=window.open("","_blank");if(!w)return alert("Allow pop-ups to print the voucher.");
+ let lines=[];
+ if(r.journal_entry_id){
+  const {data,error}=await sb.from("accounting_journal_lines").select("account_id,debit,credit,party_name").eq("journal_entry_id",r.journal_entry_id).order("line_number");
+  if(!error)lines=(data||[]).map(l=>{const a=accountingAccounts.find(x=>x.id===l.account_id)||{};return `<tr><td>${esc(a.account_code||"")}</td><td>${esc(a.account_name||"Account")}</td><td>${esc(l.party_name||"")}</td><td style="text-align:right">${Number(l.debit)?money(l.debit):"—"}</td><td style="text-align:right">${Number(l.credit)?money(l.credit):"—"}</td></tr>`;});
+ }
+ const details=[["Voucher Number",r.voucher_no],["Date (B.S.)",r.date_bs],["Date (A.D.)",r.date_ad],["Category",r.category],["Payee / Particulars",r.party_name||r.particulars],["Payment Method",r.payment_method],["Income",money(r.income_amount)],["Expense",money(r.expense_amount)],["Cash / Bank In",money(r.cash_in)],["Cash / Bank Out",money(r.cash_out)],["Debit Total",money(r.debit_total)],["Credit Total",money(r.credit_total)],["Status",r.is_journal_posted?"Journal Posted":"Legacy / Manual Record"]];
+ w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(r.voucher_no||"EMC Voucher")}</title><style>body{font:14px Arial,sans-serif;padding:28px;color:#182536}h1,h2{text-align:center;margin:4px}p{text-align:center;color:#64748b}.details{width:100%;border-collapse:collapse;margin:20px 0}.details td{padding:8px;border-bottom:1px solid #ddd}.details td:first-child{font-weight:bold;width:34%}table.lines{width:100%;border-collapse:collapse;margin-top:12px}table.lines th,table.lines td{border:1px solid #ddd;padding:8px;text-align:left}table.lines th{background:#f3f6fa}.sign{display:flex;justify-content:space-between;margin-top:70px}.sign div{width:38%;border-top:1px solid #333;padding-top:8px;text-align:center}.print{margin:20px auto;display:block;padding:9px 18px}@media print{.print{display:none}body{padding:0}}</style></head><body><h1>Education Mines Consultancy Pvt. Ltd.</h1><p>Lalbandi, Sarlahi, Nepal</p><h2>TRANSACTION VOUCHER</h2><table class="details">${details.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${esc(v??"—")}</td></tr>`).join("")}</table>${lines.length?`<h3>Accounting Entries</h3><table class="lines"><thead><tr><th>Account Code</th><th>Account</th><th>Party</th><th>DR (NPR)</th><th>CR (NPR)</th></tr></thead><tbody>${lines.join("")}</tbody></table>`:""}<div class="sign"><div>Prepared By</div><div>Authorized Signature</div></div><button class="print" onclick="window.print()">Print / Save as PDF</button></body></html>`);
+ w.document.close();w.focus();
+}
+function printAccountingDayBook(){window.print();}
+function exportAccountingDayBookCSV(){
+ const rows=filteredAccountingRows(),header=["Date BS","Date AD","Voucher","Particulars","Category","Payee","Income","Expense","DR","CR","Cash/Bank In","Cash/Bank Out","Payment Method","Journal Posted"];
+ const csv=[header,...rows.map(r=>[r.date_bs,r.date_ad,r.voucher_no,r.particulars,r.category,r.party_name,r.income_amount,r.expense_amount,r.debit_total,r.credit_total,r.cash_in,r.cash_out,r.payment_method,r.is_journal_posted])].map(row=>row.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\\n");
+ const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="EMC-Day-Book.csv";a.click();URL.revokeObjectURL(url);
+}
+function openExpenditureEntryModal(){
+ const todayBS=accountingBSDateToday();
+ $("modalTitle").textContent="Add Expenditure / Payment";
+ $("recordForm").setAttribute("onsubmit","saveAccountingExpense(event)");
+ $("saveBtn").textContent="Save Payment";
+ $("formFields").innerHTML=`<div><label>Date (B.S.)</label>${bsDatePicker("payment_date_bs",todayBS)}</div>
+ <div><label>Category</label><select id="accountingCategory" onchange="onAccountingCategoryChange()">${isAdmin?`<option value="STAFF SALARY">STAFF SALARY</option><option value="HOUSE RENT">HOUSE RENT</option>`:""}<option value="Other">Other</option></select></div>
+ <div class="full" id="accountingPayeeWrap"><label>Payee / Item Name</label><select id="accountingPayee" onchange="onAccountingPayeeChange()"><option value="">Select payee</option></select></div>
+ <div class="full" id="accountingPayeeInfo"></div>
+ <div><label>Payment Amount (NPR)</label><input id="accountingPaymentAmount" type="number" min="0.01" step="0.01" placeholder="Enter payment amount" oninput="updateAccountingPaymentPreview()"></div>
+ <div><label>Payment Method</label><select id="accountingPaymentMethod" onchange="updateAccountingPaymentPreview()"><option>Cash</option><option>Bank</option></select></div>
+ <div class="full notice" id="accountingAdvanceWrap">If payment is higher than the outstanding salary / rent, the excess will automatically be recorded as a separate employee / landlord advance.</div>
+ <div class="full formhint" id="accountingPaymentPreview"></div>
+ <div class="full" id="accountingOtherFields" style="display:none">
+  <label>Expense Title</label><input id="otherExpenseTitle" placeholder="e.g. Electricity bill">
+  <label>Expense Category</label><select id="otherExpenseCategory"><option>Marketing</option><option>Office</option><option>Travel</option><option>Utilities</option><option>General</option><option>Other</option></select>
+  <label>Payee / Item Name</label><input id="otherExpensePayee" placeholder="Enter payee or item name">
+  <label>Remarks</label><textarea id="otherExpenseRemarks" placeholder="Optional remarks"></textarea>
+ </div>
+ <div class="full" id="accountingCommonRemarks"><label>Remarks (Optional)</label><textarea id="accountingRemarks" placeholder="Payment reference or remarks"></textarea></div>`;
+ $("recordModal").classList.add("show");
+ onAccountingCategoryChange();
+}
+function onAccountingCategoryChange(){
+ const category=$("accountingCategory")?.value||"Other";if(!isAdmin&&category!=="Other"){alert("Only administrators can access salary and house rent payments.");$("accountingCategory").value="Other";return onAccountingCategoryChange();}
+ const payeeWrap=$("accountingPayeeWrap"),other=$("accountingOtherFields"),advance=$("accountingAdvanceWrap"),info=$("accountingPayeeInfo");
+ if(category==="Other"){
+  payeeWrap.style.display="none";other.style.display="block";advance.style.display="none";info.innerHTML="";$("accountingPaymentPreview").textContent="Manual expenditure will be saved in the existing Expenditure Register.";return;
+ }
+ other.style.display="none";payeeWrap.style.display="block";advance.style.display="block";
+ let options=[];
+ if(category==="STAFF SALARY"){
+  options=list("salary").filter(x=>!x.legacy&&x.accrual_posted).map(x=>({id:x.id,label:`${x.staff_name} · ${x.bs_month} ${x.bs_year} · Due ${money(x.net_payable)}`,due:Number(x.net_payable)||0}));
+ }else{
+  options=list("house_rent").filter(x=>x.accrual_posted).map(x=>({id:x.id,label:`${x.landlord_name} · ${x.property_name} · ${x.bs_month} ${x.bs_year} · Due ${money(x.due_amount)}`,due:Number(x.due_amount)||0}));
+ }
+ $("accountingPayee").innerHTML=`<option value="">Select ${category==="STAFF SALARY"?"staff member":"landlord / property"}…</option>`+options.map(x=>`<option value="${esc(x.id)}">${esc(x.label)}</option>`).join("");
+ if(!options.length){$("accountingPayeeInfo").innerHTML=`<div class="notice">No ${category==="STAFF SALARY"?"salary":"rent"} ledger entries with a posted accrual are available for payment. Check the active Nepali month and reconcile any records marked “Accrual Pending”.</div>`;}
+ updateAccountingPaymentPreview();
+}
+function selectedAccountingPayee(){
+ const category=$("accountingCategory")?.value,id=$("accountingPayee")?.value;
+ if(!id)return null;
+ return category==="STAFF SALARY"?list("salary").find(x=>String(x.id)===String(id)):list("house_rent").find(x=>String(x.id)===String(id));
+}
+function onAccountingPayeeChange(){updateAccountingPaymentPreview();}
+function updateAccountingPaymentPreview(){
+ const category=$("accountingCategory")?.value,info=$("accountingPayeeInfo"),preview=$("accountingPaymentPreview");
+ if(category==="Other"){if(preview)preview.textContent="Other expenditure is saved in the existing manual expenditure register.";return;}
+ const x=selectedAccountingPayee();
+ if(!x){info.innerHTML="";preview.textContent="Select a payee to fetch the actual outstanding balance.";return;}
+ const due=category==="STAFF SALARY"?Number(x.net_payable)||0:Number(x.due_amount)||0;
+ const paid=category==="STAFF SALARY"?Number(x.previous_received)||0:Number(x.paid_amount)||0;
+ const monthly=category==="STAFF SALARY"?Number(x.base_salary)||0:Number(x.monthly_rent)||0;
+ const party=category==="STAFF SALARY"?x.staff_name:x.landlord_name;
+ const id=category==="STAFF SALARY"?x.staff_id:x.property_name;
+ info.innerHTML=`<div class="profile-grid"><div class="profile-item"><small>${category==="STAFF SALARY"?"Staff Name":"Landlord Name"}</small><strong>${esc(party||"—")}</strong></div><div class="profile-item"><small>${category==="STAFF SALARY"?"Staff ID":"Property"}</small><strong>${esc(String(id??"—"))}</strong></div><div class="profile-item"><small>Monthly ${category==="STAFF SALARY"?"Salary":"Rent"}</small><strong>${money(monthly)}</strong></div><div class="profile-item"><small>Nepali Month (B.S.)</small><strong>${esc((x.bs_month||"")+" "+(x.bs_year||""))}</strong></div><div class="profile-item"><small>Previous Paid</small><strong>${money(paid)}</strong></div><div class="profile-item"><small>Outstanding Amount</small><strong>${money(due)}</strong></div></div>`;
+ const amount=Number($("accountingPaymentAmount").value)||0,remaining=Math.max(0,due-Math.min(amount,due)),excess=Math.max(0,amount-due);
+ preview.innerHTML=`Current payment: <strong>${money(amount)}</strong> · Remaining balance: <strong>${money(remaining)} ${remaining>0?"CR":""}</strong>${excess>0?`<br><span class="success">Automatic advance to record: ${money(excess)}</span>`:""}`;
+}
+async function saveAccountingExpense(e){
+ e.preventDefault();
+ const category=$("accountingCategory").value;if(!isAdmin&&category!=="Other")return alert("Only administrators can record salary or house rent payments.");const form=new FormData($("recordForm")),dateBS=collectBsPicker(form,"payment_date_bs"),parts=dateBS.split("-").map(Number);
+ if(parts.length!==3||parts[1]<1||parts[1]>12||parts[2]<1||parts[2]>32)return alert("Please select a valid B.S. payment date.");
+ if(window.NepaliDate){const check=new NepaliDate(parts[0],parts[1]-1,parts[2]);if(check.getYear()!==parts[0]||check.getMonth()!==parts[1]-1||check.getDate()!==parts[2])return alert("The selected day does not exist in that B.S. month.");}
+ const amount=Number($("accountingPaymentAmount").value)||0,method=$("accountingPaymentMethod").value,remarks=$("accountingRemarks")?.value.trim()||"";
+ if(amount<=0)return alert("Enter a payment amount greater than zero.");
+ $("saveBtn").disabled=true;$("saveBtn").textContent="Posting…";
+ try{
+  if(category==="Other"){
+   const ad=accountingBSDateToAD(dateBS);if(!ad)throw new Error("The selected Nepali month is not configured in the Nepali month calendar.");
+   const title=$("otherExpenseTitle").value.trim(),payee=$("otherExpensePayee").value.trim(),manualCategory=$("otherExpenseCategory").value,note=remarks;
+   if(!title||!payee)throw new Error("Enter the expense title and payee / item name.");
+   const nextId=Math.max(0,...records.map(r=>Number(r.record_key)||0))+1;
+   const data={id:nextId,title,category:manualCategory,payee_name:payee,amount,date:ad,date_bs:dateBS,payment_method:method,note};
+   const {error}=await sb.from(TABLE).insert({record_type:"expenses",record_key:nextId,data});
+   if(error)throw error;
+   closeModal();await loadRecords();alert("Expenditure saved successfully.");
+  }else{
+   const payee=selectedAccountingPayee();if(!payee)throw new Error("Select a staff member or landlord.");
+   const account=accountingMethodAccount(method);if(!account)throw new Error("The selected Cash / Bank account is not configured in the Chart of Accounts.");
+   const due=category==="STAFF SALARY"?Number(payee.net_payable)||0:Number(payee.due_amount)||0;
+   const allowAdvance=true; // Excess is automatically posted as a separate advance.
+   const requestId=crypto.randomUUID();
+   const {data,error}=await sb.rpc("record_expenditure_payment",{
+    p_category:category,p_payee_id:payee.id,p_amount:amount,p_payment_date_bs:dateBS,
+    p_payment_method:method,p_cash_bank_account_id:account.id,p_allow_advance:allowAdvance,
+    p_remarks:remarks||null,p_request_id:requestId
+   });
+   if(error)throw error;
+   closeModal();await loadRecords();
+   alert(`Payment posted successfully. Voucher: ${data?.voucher_no||"Generated"}\\nPayment: ${money(data?.payment_amount||0)}\\nAdvance: ${money(data?.advance_amount||0)}`);
+  }
+ }catch(err){alert("Could not save transaction: "+(err.message||String(err)));}
+ finally{$("saveBtn").disabled=false;$("saveBtn").textContent="Save Payment";}
+}
+
+function openUtilityBillModal(){
+ const todayBS=accountingBSDateToday();
+ $("modalTitle").textContent="Record Utility Bill";
+ $("recordForm").setAttribute("onsubmit","saveUtilityBill(event)");
+ $("saveBtn").textContent="Save & Post Payment";
+ $("formFields").innerHTML=`<div><label>Bill Date (B.S.)</label>${bsDatePicker("utility_bill_date",todayBS)}</div>
+  <div><label>Utility Type</label><select id="utilityType"><option>Electricity</option><option>Water</option><option>Internet</option><option>Gas</option><option>Telephone</option><option>Other</option></select></div>
+  <div><label>Provider / Company</label><input id="utilityProvider" required placeholder="e.g. NEA / Khanepani"></div>
+  <div><label>Meter Number (Optional)</label><input id="utilityMeter" placeholder="Enter meter number"></div>
+  <div><label>Previous Unit / Reading</label><input id="utilityPrevious" type="number" min="0" step="0.001" value="0" oninput="updateUtilityBillPreview()" required></div>
+  <div><label>Current Unit / Reading</label><input id="utilityCurrent" type="number" min="0" step="0.001" value="0" oninput="updateUtilityBillPreview()" required></div>
+  <div><label>Rate per Unit (NPR)</label><input id="utilityRate" type="number" min="0" step="0.0001" placeholder="Enter current tariff rate" oninput="updateUtilityBillPreview()" required></div>
+  <div><label>Payment Method</label><select id="utilityPaymentMethod"><option>Cash</option><option>Bank</option></select></div>
+  <div class="full formhint" id="utilityBillPreview">Consumed units: 0 · Bill amount: Rs. 0.00</div>
+  <div class="full"><label>Remarks (Optional)</label><textarea id="utilityRemarks" placeholder="Bill number, billing period or remarks"></textarea></div>
+  <div class="full notice">The amount is calculated automatically as (Current Reading − Previous Reading) × Rate per Unit. Saving posts the payment to Expenditure Ledger.</div>`;
+ $("recordModal").classList.add("show");
+}
+function updateUtilityBillPreview(){
+ const old=Number($("utilityPrevious")?.value)||0,now=Number($("utilityCurrent")?.value)||0,rate=Number($("utilityRate")?.value)||0;
+ const units=Math.max(0,now-old),amount=Math.round(units*rate*100)/100;
+ const valid=now>=old;
+ $("utilityBillPreview").innerHTML=`Consumed units: <strong>${units.toLocaleString("en-IN")}</strong> · Calculated bill: <strong>${money(amount)}</strong>${valid?"":" <span class=\"due\">Current reading cannot be below previous reading.</span>"}`;
+}
+async function saveUtilityBill(e){
+ e.preventDefault();
+ const form=new FormData($("recordForm")),dateBS=collectBsPicker(form,"utility_bill_date");
+ if(!validBsDate(dateBS))return alert("Select a valid Nepali B.S. bill date.");
+ const old=Number($("utilityPrevious").value),now=Number($("utilityCurrent").value),rate=Number($("utilityRate").value);
+ const method=$("utilityPaymentMethod").value,provider=$("utilityProvider").value.trim(),type=$("utilityType").value;
+ if(!provider)return alert("Enter the utility provider / company.");
+ if(!Number.isFinite(old)||!Number.isFinite(now)||old<0||now<old)return alert("Current reading must be greater than or equal to the previous reading.");
+ if(!Number.isFinite(rate)||rate<0)return alert("Enter a valid rate per unit.");
+ const units=now-old,amount=Math.round(units*rate*100)/100;
+ if(amount<=0)return alert("Calculated bill amount must be greater than zero.");
+ const account=accountingMethodAccount(method);if(!account)return alert("The selected Cash / Bank account is not configured in Chart of Accounts.");
+ $("saveBtn").disabled=true;$("saveBtn").textContent="Posting…";
+ try{
+  const {data,error}=await sb.rpc("record_utility_bill",{
+   p_bill_date_bs:dateBS,p_utility_type:type,p_provider_name:provider,p_meter_number:$("utilityMeter").value.trim()||null,
+   p_previous_reading:old,p_current_reading:now,p_rate_per_unit:rate,p_payment_method:method,
+   p_cash_bank_account_id:account.id,p_remarks:$("utilityRemarks").value.trim()||null,p_request_id:crypto.randomUUID()
+  });
+  if(error)throw error;
+  closeModal();await loadRecords();
+  alert(`Utility bill posted successfully.\nVoucher: ${data?.voucher_no||"Generated"}\nConsumed units: ${data?.consumed_units??units}\nAmount: ${money(data?.bill_amount??amount)}\nDr Utilities Expense · Cr ${method}`);
+ }catch(err){alert("Could not save utility bill: "+(err.message||String(err)));}
+ finally{$("saveBtn").disabled=false;$("saveBtn").textContent="Save Payment";}
+}
+
+async function saveRecord(e){e.preventDefault();if(!editing)return;const type=editing.type,cfg=modules[type],form=new FormData($ ("recordForm")),obj={};cfg.fields.forEach(f=>{const [key,,kind]=f;let v=form.get(key);if(kind==="bsdate")v=collectBsPicker(form,key);if(kind==="student"){const st=students().find(s=>Number(s.id)===Number(v));obj.student_id=Number(v);obj.student=st?.name||"";}else if(kind==="staff"){const st=list("staff").find(s=>Number(s.id)===Number(v));obj.staff_id=Number(v);obj.staff_name=st?.name||"";}else obj[key]=kind==="number"?(v===""?0:Number(v)):String(v||"").trim();});for(const f of cfg.fields.filter(x=>x[2]==="bsdate")){const val=obj[f[0]],parts=val.split("-").map(Number);if(parts.length!==3||parts.some(x=>!Number.isFinite(x))||parts[1]<1||parts[1]>12||parts[2]<1||parts[2]>32)return alert("Please select a valid B.S. date.");if(window.NepaliDate){const check=new NepaliDate(parts[0],parts[1]-1,parts[2]);if(check.getYear()!==parts[0]||check.getMonth()!==parts[1]-1||check.getDate()!==parts[2])return alert("The selected day does not exist in that B.S. month.");}}if(type==="salary"){const staff=list("staff").find(x=>Number(x.id)===Number(obj.staff_id));obj.staff_name=staff?.name||obj.staff_name||"";obj.base_salary=Number(obj.base_salary)||Number(staff?.salary)||0;obj.leave_days=Number(obj.leave_days)||0;obj.leave_deduction=roundMoney(obj.base_salary/30*obj.leave_days);obj.advance=Number(obj.advance)||0;obj.previous_received=Number(obj.previous_received)||0;obj.other_deductions=Number(obj.other_deductions)||0;obj.net_payable=roundMoney(obj.base_salary-obj.leave_deduction-obj.advance-obj.previous_received-obj.other_deductions);obj.status=obj.net_payable<=0?"Settled":"Pending";}if(type==="house_rent"){obj.due_amount=Math.max(0,roundMoney((Number(obj.monthly_rent)||0)-(Number(obj.paid_amount)||0)));if(obj.due_amount===0)obj.status="Paid";else if(Number(obj.paid_amount)>0)obj.status="Partial";else obj.status="Unpaid";}const existing=editing.id?list(type).find(x=>Number(x.id)===Number(editing.id)):null;const id=existing?Number(existing.id):Math.max(0,...records.map(r=>Number(r.record_key)||0))+1;const staffMonthlySalary=type==="staff"?Math.max(0,Number(obj.salary)||0):null;if(type==="staff")delete obj.salary;obj.id=id;$ ("saveBtn").disabled=true;$ ("saveBtn").textContent="Saving…";const query=existing?sb.from(TABLE).update({data:obj}).eq("record_type",type).eq("record_key",id):sb.from(TABLE).insert({record_type:type,record_key:id,data:obj});const {error}=await query;$ ("saveBtn").disabled=false;$ ("saveBtn").textContent="Save record";if(error){alert("Save failed: "+error.message);return;}if(type==="staff"){const salaryResult=await sb.from("staff_salary_master").upsert({staff_record_key:id,monthly_base_salary:staffMonthlySalary,updated_by:currentUser?.id||null,updated_at:new Date().toISOString()},{onConflict:"staff_record_key"});if(salaryResult.error){alert("Staff profile saved, but monthly salary could not be saved to the confidential admin ledger: "+salaryResult.error.message);}}closeModal();await loadRecords();}
+async function deleteRecord(type,id){if(!isAdmin)return alert("Only administrators can delete records.");if(!confirm("Permanently delete this record? The action will remain in its activity history."))return;const {error}=await sb.from(TABLE).delete().eq("record_type",type).eq("record_key",id);if(error){alert("Delete failed: "+error.message);return;}await loadRecords();}
+async function updateStatus(type,id){const item=list(type).find(x=>Number(x.id)===Number(id));if(!item)return;const cfg=modules[type],field=cfg.fields.find(f=>f[0]==="status"),opts=field?.[4]||[];const chosen=prompt("Update status:\n"+opts.map((v,i)=>`${i+1}. ${v}`).join("\n"),item.status||"");if(chosen===null||!chosen.trim())return;const status=opts.find(x=>x.toLowerCase()===chosen.trim().toLowerCase())||opts[Number(chosen)-1];if(!status)return alert("Please enter one of the listed status values.");const updated={...item,status};const {error}=await sb.from(TABLE).update({data:updated}).eq("record_type",type).eq("record_key",id);if(error){alert("Status update failed: "+error.message);return;}await loadRecords();}
+async function addActivity(type,id,action,description,details={}){const {error}=await sb.from(ACTIVITY).insert({record_type:type,record_key:id,action,description,details});if(error){alert("Could not save activity: "+error.message);return false;}return true;}
+async function logContact(type,id,action){const item=list(type).find(x=>Number(x.id)===Number(id));await addActivity(type,id,action,`${action.toUpperCase()} action initiated for ${item?.name||item?.student||"record"}`,{phone:item?.phone||""});}
+async function contactAction(event,type,id,action,href){event.preventDefault();await logContact(type,id,action);window.location.href=href;}
+async function showActivity(type,id){if(!isAdmin)return alert("Only administrators can view edit history.");activityContext={type,id};const item=list(type).find(x=>Number(x.id)===Number(id));const {data,error}=await sb.from(ACTIVITY).select("id,action,description,details,actor_name,created_at").eq("record_type",type).eq("record_key",id).order("created_at",{ascending:false}).limit(100);if(error)return alert("Could not load activity: "+error.message);const log=data||[];$ ("modalTitle").textContent=`History · ${item?.name||item?.student||item?.title||"Record"}`;$ ("formFields").innerHTML=`<div class="full">${["students","leads","visa"].includes(type)?contactLinks(type,item):""}<h4>Follow-up / Activity history</h4><div class="activity-list">${log.length?log.map(a=>`<div class="activity-item"><strong>${esc(a.description)}</strong><small>${esc(a.actor_name||"EMC staff")} · ${new Date(a.created_at).toLocaleString()} · ${esc(a.action)}</small></div>`).join(""):`<p class="muted">No activity recorded yet.</p>`}</div><label>Add note or follow-up</label><textarea id="activityNote" placeholder="Call summary, SMS, meeting note or task update…"></textarea><label>Activity type</label><select id="activityKind"><option value="note">Note</option><option value="follow_up">Follow-up</option><option value="task_updated">Task update</option></select><label>Next follow-up date (optional)</label><input id="activityDate" type="date"><div class="modalfoot"><button type="button" onclick="saveActivityNote()">Save activity</button></div></div>`;$ ("recordModal").classList.add("show");}
+async function saveActivityNote(){if(!activityContext)return;const note=$ ("activityNote").value.trim(),date=$ ("activityDate").value,kind=$ ("activityKind").value;if(!note)return alert("Please enter a note.");const ok=await addActivity(activityContext.type,activityContext.id,kind,note,{next_followup:date||null});if(!ok)return;if(date){const item=list(activityContext.type).find(x=>Number(x.id)===Number(activityContext.id));const {error}=await sb.from(TABLE).update({data:{...item,followup:date}}).eq("record_type",activityContext.type).eq("record_key",activityContext.id);if(error){alert("Activity saved, but follow-up date was not updated: "+error.message);return;}}closeModal();await loadRecords();}
+
+
+async function renderApprovals(){
+ if(!isAdmin){$("page").innerHTML='<div class="notice">Only administrators can approve accounts.</div>';return;}
+ $("page").innerHTML='<div class="pagehead"><div><h2>Account Approvals</h2><p>Review registrations and assign approved staff roles.</p></div><button class="secondary" onclick="renderApprovals()">Refresh</button></div><div class="cards" id="approvalStats"></div><div class="panel"><div id="approvalTable" class="muted">Loading account requests…</div></div>';
+ const {data:profiles,error}=await sb.from("profiles").select("id,full_name,phone,approval_status,created_at").order("created_at",{ascending:false});
+ if(error){$("approvalTable").textContent="Could not load accounts: "+error.message;return;}
+ const rows=profiles||[],pending=rows.filter(x=>x.approval_status==="pending"),approved=rows.filter(x=>x.approval_status==="approved"),rejected=rows.filter(x=>x.approval_status==="rejected");
+ $("approvalStats").innerHTML=[["Pending",pending.length],["Approved",approved.length],["Rejected",rejected.length]].map(([a,b])=>`<div class="stat"><small>${a} accounts</small><strong>${b}</strong></div>`).join("");
+ if(!rows.length){$("approvalTable").innerHTML='<div class="empty">No registered accounts found.</div>';return;}
+ const roles=await Promise.all(rows.map(async p=>{const r=await sb.from("user_roles").select("role").eq("user_id",p.id);return [p.id,(r.data||[]).map(x=>x.role).join(", ")||"No role"];}));
+ const roleMap=Object.fromEntries(roles);
+ $("approvalTable").innerHTML=`<div class="tablewrap"><table><thead><tr><th>Name</th><th>Phone</th><th>Status</th><th>Current role</th><th>Registered</th><th>Admin action</th></tr></thead><tbody>${rows.map(p=>`<tr><td>${esc(p.full_name||"Unnamed")}</td><td>${esc(p.phone||"—")}</td><td><span class="pill">${esc(p.approval_status)}</span></td><td>${esc(roleMap[p.id])}</td><td>${p.created_at?new Date(p.created_at).toLocaleDateString():"—"}</td><td>${p.approval_status==="pending"||p.approval_status==="rejected"?`<select id="role-${p.id}" style="min-width:120px"><option value="staff">Staff</option><option value="counselor">Counselor</option><option value="accountant">Accountant</option></select><div class="actions" style="margin-top:6px"><button onclick="approveAccount('${p.id}')">Approve</button><button class="danger" onclick="rejectAccount('${p.id}')">Reject</button></div>`:p.approval_status==="approved"?`<button class="secondary" onclick="changeAccountRole('${p.id}')">Change role</button>`:"—"}</td></tr>`).join("")}</tbody></table></div>`;
+}
+async function approveAccount(userId){
+ if(!isAdmin)return alert("Admin only.");
+ const role=$("role-"+userId)?.value||"staff";
+ if(!["staff","counselor","accountant"].includes(role))return alert("Choose a valid role.");
+ if(!confirm("Approve this account and assign "+role+" role?"))return;
+ const del=await sb.from("user_roles").delete().eq("user_id",userId);if(del.error)return alert("Could not update roles: "+del.error.message);
+ const ins=await sb.from("user_roles").insert({user_id:userId,role});if(ins.error)return alert("Role assignment failed: "+ins.error.message);
+ const upd=await sb.from("profiles").update({approval_status:"approved",approved_at:new Date().toISOString(),approved_by:currentUser.id}).eq("id",userId);
+ if(upd.error)return alert("Role saved, but approval status update failed: "+upd.error.message);
+ alert("Account approved and role assigned.");await renderApprovals();
+}
+async function rejectAccount(userId){
+ if(!isAdmin)return alert("Admin only.");if(!confirm("Reject this account request?"))return;
+ const upd=await sb.from("profiles").update({approval_status:"rejected",approved_at:null,approved_by:currentUser.id}).eq("id",userId);
+ if(upd.error)return alert("Rejection failed: "+upd.error.message);
+ await sb.from("user_roles").delete().eq("user_id",userId);await renderApprovals();
+}
+async function changeAccountRole(userId){
+ if(!isAdmin)return alert("Admin only.");
+ const role=prompt("Enter role: staff, counselor, or accountant");if(!role)return;
+ const clean=role.trim().toLowerCase();if(!["staff","counselor","accountant"].includes(clean))return alert("Invalid role.");
+ const del=await sb.from("user_roles").delete().eq("user_id",userId);if(del.error)return alert(del.error.message);
+ const ins=await sb.from("user_roles").insert({user_id:userId,role:clean});if(ins.error)return alert(ins.error.message);
+ await renderApprovals();
+}
+function printSlip(title,subtitle,rows,filename){
+ const w=window.open("","_blank","width=850,height=700");if(!w)return alert("Please allow pop-ups to print the slip.");
+ const body=rows.map(([k,v])=>`<tr><th>${esc(k)}</th><td>${esc(v??"—")}</td></tr>`).join("");
+ w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(filename)}</title><style>body{font:14px Arial,sans-serif;color:#172437;padding:34px}header{text-align:center;border-bottom:2px solid #102b52;padding-bottom:14px}h1{color:#102b52;margin:0;font-size:22px}header p{margin:5px 0;color:#52647a}.meta{margin:22px 0}table{width:100%;border-collapse:collapse;margin-top:18px}th,td{border:1px solid #dce5ef;padding:11px;text-align:left}th{width:38%;background:#f2f6fa}.sign{display:flex;justify-content:space-between;margin-top:65px}.sign div{border-top:1px solid #555;padding-top:8px;width:40%;text-align:center}.print{margin:20px 0;padding:10px 18px;background:#1769aa;color:white;border:0;border-radius:7px}@media print{.print{display:none}body{padding:0}}</style></head><body><header><h1>Education Mines Consultancy Pvt. Ltd.</h1><p>Lalbandi-7, Sarlahi, Nepal · Official Payment Record</p><h2>${esc(title)}</h2><p>${esc(subtitle)}</p></header><table>${body}</table><div class="sign"><div>Prepared By</div><div>Receiver / Authorized Signature</div></div><button class="print" onclick="window.print()">Print / Save as PDF</button><script>window.onload=()=>setTimeout(()=>window.print(),300)<\\/script></body></html>`);
+ w.document.close();
+}
+function printSalarySlip(id){
+ const x=list("salary").find(v=>String(v.id)===String(id));if(!x)return;
+ printSlip("STAFF SALARY PAYMENT SLIP",`${x.bs_month||""} ${x.bs_year||""}`,[
+ ["Slip / Record ID",x.id],["Staff Name",x.staff_name],["Nepali Month",`${x.bs_month||""} ${x.bs_year||""}`],["Base Salary",money(x.base_salary)],["Leave Days",x.leave_days||0],["Leave Deduction",money(x.leave_deduction)],["Advance Taken",money(x.advance)],["Previous / Partial Payment",money(x.previous_received)],["Other Deductions",money(x.other_deductions)],["Net Payable",money(x.net_payable)],["Payment Status",x.status||"Pending"],["Notes",x.note||"—"]
+ ],`EMC-Salary-${x.staff_name||id}-${x.bs_month||""}-${x.bs_year||""}`);
+}
+function printRentSlip(id){
+ const x=list("house_rent").find(v=>String(v.id)===String(id));if(!x)return;
+ printSlip("HOUSE RENT PAYMENT SLIP",`${x.bs_month||""} ${x.bs_year||""}`,[
+ ["Slip / Record ID",x.id],["Property / House",x.property_name],["Landlord Name",x.landlord_name],["Landlord Contact",x.landlord_contact||"—"],["Nepali Month",`${x.bs_month||""} ${x.bs_year||""}`],["Monthly Rent",money(x.monthly_rent)],["Paid Amount",money(x.paid_amount)],["Due Amount",money(x.due_amount)],["Payment Date (B.S.)",x.payment_date_bs||"—"],["Payment Status",x.status||"—"],["Notes",x.note||"—"]
+ ],`EMC-Rent-${x.property_name||id}-${x.bs_month||""}-${x.bs_year||""}`);
+}
+async function openInquiryReply(id){
+ const x=list("leads").find(v=>Number(v.id)===Number(id));if(!x)return;
+ const phone=String(x.phone||"").replace(/[^0-9+]/g,"");
+ $("modalTitle").textContent="Reply to Inquiry · "+(x.name||"Customer");
+ const history=Array.isArray(x.reply_history)?x.reply_history:[];
+ $("formFields").innerHTML=`<div class="full"><p><strong>${esc(x.name||"Customer")}</strong> · ${esc(phone||"No phone number")} · ${esc(x.destination||"")}</p><h4>Inquiry reply history</h4><div class="activity-list">${history.length?history.slice().reverse().map(h=>`<div class="activity-item"><strong>${esc(h.message||"")}</strong><small>${esc(h.by||"EMC team")} · ${esc(h.channel||"internal")} · ${esc(h.at||"")}</small></div>`).join(""):`<p class="muted">No replies saved yet.</p>`}</div><label>Reply channel</label><select id="replyChannel"><option value="whatsapp">WhatsApp</option><option value="sms">SMS</option><option value="note">Save internal note only</option></select><label>Message / Reply</label><textarea id="replyText" placeholder="Write your response to the inquiry…"></textarea><p class="formhint">All approved staff and counselors can view this inquiry and save a reply. WhatsApp or SMS opens your device/app; the message is not sent automatically.</p><div class="modalfoot"><button type="button" onclick="sendInquiryReply(${Number(id)})">Continue / Save reply</button></div></div>`;
+ $("recordModal").classList.add("show");
+}
+async function sendInquiryReply(id){
+ const x=list("leads").find(v=>Number(v.id)===Number(id)),msg=$("replyText").value.trim(),channel=$("replyChannel").value;
+ if(!msg)return alert("Write a reply first.");
+ const history=Array.isArray(x?.reply_history)?x.reply_history:[];
+ const updated={...x,last_reply:msg,reply_history:[...history,{message:msg,channel,by:currentUser?.email||currentRoles.join(", "),at:new Date().toLocaleString()}]};
+ const saved=await sb.from(TABLE).update({data:updated}).eq("record_type","leads").eq("record_key",id);
+ if(saved.error)return alert("Could not save inquiry reply: "+saved.error.message);
+ const ok=await addActivity("leads",id,"note",`Inquiry reply saved by ${currentRoles.join(", ")}: ${msg}`,{channel,phone:x?.phone||"",reply_text:msg});
+ if(!ok)return;
+ if(channel!=="note"){
+  const raw=String(x?.phone||"").replace(/[^0-9]/g,"");
+  if(!raw)return alert("Reply saved in inquiry history, but this inquiry has no phone number.");
+  const number=raw.length===10?"977"+raw:raw;
+  const url=channel==="whatsapp"?`https://wa.me/${number}?text=${encodeURIComponent(msg)}`:`sms:${number}?body=${encodeURIComponent(msg)}`;
+  window.open(url,"_blank","noopener");
+ }
+ closeModal();alert("Reply saved to inquiry history. Complete sending in the selected app if it opened.");
+}
+
+const BS_MONTHS=["Baishakh","Jestha","Ashadh","Shrawan","Bhadra","Ashwin","Kartik","Mangsir","Poush","Magh","Falgun","Chaitra"];
+function roundMoney(n){return Math.round((Number(n)||0)*100)/100;}
+function nepaliNow(){try{const nd=window.NepaliDate?new NepaliDate():null;return nd?{year:nd.getYear(),month:nd.getMonth(),day:nd.getDate()}:null;}catch(e){return null;}}
+function bsDatePicker(name,value){let y=2083,m=0,d=1;const parts=String(value||"").split("-");if(parts.length===3){y=Number(parts[0])||y;m=(Number(parts[1])||1)-1;d=Number(parts[2])||1;}return `<div class="bs-picker"><select aria-label="B.S. year" name="${name}_year">${Array.from({length:111},(_,i)=>1990+i).map(v=>`<option value="${v}" ${v===y?"selected":""}>${v}</option>`).join("")}</select><select aria-label="B.S. month" name="${name}_month">${BS_MONTHS.map((v,i)=>`<option value="${i+1}" ${i===m?"selected":""}>${v}</option>`).join("")}</select><select aria-label="B.S. day" name="${name}_day">${Array.from({length:32},(_,i)=>i+1).map(v=>`<option value="${v}" ${v===d?"selected":""}>${v}</option>`).join("")}</select></div><input type="hidden" name="${name}" value="${esc(value||"")}"><div class="formhint">Select B.S. year, month and day. Saved as YYYY-MM-DD.</div>`;}
+function collectBsPicker(form,name){const y=form.get(name+"_year"),m=String(form.get(name+"_month")||"1").padStart(2,"0"),d=String(form.get(name+"_day")||"1").padStart(2,"0");return `${y}-${m}-${d}`;}
+function viewStaffProfile(id){const st=list("staff").find(x=>Number(x.id)===Number(id));if(!st)return;$("modalTitle").textContent="Staff Profile · "+(st.name||"");$("formFields").innerHTML=`<div class="full"><div class="profile-grid"><div class="profile-item"><small>Full name</small><strong>${esc(st.name)}</strong></div><div class="profile-item"><small>Contact number</small><strong>${esc(st.phone||"Not provided")}</strong>${st.phone?contactLinks("staff",st):""}</div><div class="profile-item"><small>Email</small><strong>${esc(st.email||"—")}</strong></div><div class="profile-item"><small>Position</small><strong>${esc(st.position||"—")}</strong></div>${isAdmin?`<div class="profile-item"><small>Monthly base salary</small><strong>${money(st.salary)}</strong></div>`:""}<div class="profile-item"><small>Status</small><strong>${esc(st.status||"—")}</strong></div><div class="profile-item"><small>Join Date (B.S.)</small><strong>${esc(st.joined_bs||"—")}</strong></div></div></div>`;$("recordModal").classList.add("show");}
+async function ensureCurrentMonthAccountingLedgers(){
+ const nd=nepaliNow();if(!nd)return;
+ const year=nd.year,monthNumber=nd.month+1,monthName=BS_MONTHS[nd.month];
+ const period=accountingPeriods.find(x=>Number(x.bs_year)===year&&Number(x.month_number)===monthNumber);
+ if(!period)return;
+ const [payrollRes,latestPayrollRes]=await Promise.all([
+  sb.from("staff_payroll").select("staff_record_key").eq("bs_year",year).eq("bs_month_number",monthNumber).eq("is_voided",false),
+  sb.from("staff_payroll").select("staff_record_id,staff_record_key,staff_name,monthly_base_salary,bs_year,bs_month_number").eq("is_voided",false).order("bs_year",{ascending:false}).order("bs_month_number",{ascending:false})
+ ]);
+ const existingStaff=new Set((payrollRes.data||[]).map(x=>String(x.staff_record_key)));
+ const latestByStaff=new Map();
+ for(const p of latestPayrollRes.data||[]){const key=String(p.staff_record_key||"");const py=Number(p.bs_year),pm=Number(p.bs_month_number);if(key&&(py<year||(py===year&&pm<monthNumber))&&!latestByStaff.has(key))latestByStaff.set(key,p);}
+ // Carry forward the latest normalized payroll master rows so staff without a legacy profile
+ // still receive a monthly obligation when a new B.S. month becomes current.
+ for(const [key,prior] of latestByStaff){
+  if(existingStaff.has(key)||!(Number(prior.monthly_base_salary)>0))continue;
+  const staffRecord=records.find(r=>r.record_type==="staff"&&String(r.record_key)===key);
+  if(staffRecord&&staffRecord.data?.status==="Inactive")continue;
+  const {error}=await sb.from("staff_payroll").insert({
+   staff_record_id:prior.staff_record_id||staffRecord?.id||null,
+   staff_record_key:Number(key),staff_name:prior.staff_name||staffRecord?.data?.name||"Staff",
+   bs_year:year,bs_month_number:monthNumber,bs_month_name:monthName,
+   monthly_base_salary:Number(prior.monthly_base_salary),created_by:currentUser?.id||null,
+   notes:"Automatically carried forward for the active Nepali month."
+  });
+  if(error)console.warn("Monthly salary obligation not generated for "+(prior.staff_name||key)+":",error.message);
+  else existingStaff.add(key);
+ }
+ // New staff who do not yet have any normalized payroll history are generated from the Staff register.
+ for(const row of records.filter(r=>r.record_type==="staff"&&r.data?.status!=="Inactive")){
+  const st=row.data||{},key=String(row.record_key);
+  const monthlySalary=Number(accountingStaffSalaryMasters.find(m=>String(m.staff_record_key)===key)?.monthly_base_salary)||0;if(existingStaff.has(key)||!(monthlySalary>0))continue;
+  const {error}=await sb.from("staff_payroll").insert({
+   staff_record_id:row.id,staff_record_key:Number(row.record_key),staff_name:st.name||"Staff",
+   bs_year:year,bs_month_number:monthNumber,bs_month_name:monthName,
+   monthly_base_salary:monthlySalary,created_by:currentUser?.id||null,
+   notes:"Automatically generated for the active Nepali month."
+  });
+  if(error)console.warn("Monthly salary obligation not generated for "+(st.name||key)+":",error.message);
+  else existingStaff.add(key);
+ }
+ // Rent obligations are generated only by the database processor. It applies the
+ // configured rent start/end dates and uses ON CONFLICT DO NOTHING, avoiding duplicate
+ // rows when multiple users open the MIS at the same time or a month was already voided.
+}
+async function migrateLocalData(){const key="emc_management_v1_"+(currentUser?.id||"");let old;try{const raw=localStorage.getItem(key);if(!raw)return alert("No old EMC browser records found on this device for this account.");old=JSON.parse(raw);}catch(e){return alert("Could not read old browser data: "+e.message);}if(!confirm("Import old browser records into shared Supabase? Existing IDs may be updated."))return;let count=0;for(const type of Object.keys(modules)){for(const item of (Array.isArray(old[type])?old[type]:[])){const id=Number(item.id)||Math.max(0,...records.map(r=>Number(r.record_key)||0))+1;const data={...item,id};const {error}=await sb.from(TABLE).insert({record_type:type,record_key:id,data});if(error){alert(`Stopped at ${type}: ${error.message}. Imported ${count} records.`);await loadRecords();return;}count++;}}await loadRecords();alert(`Imported ${count} records.`);}
+function downloadLeadTemplate(format){const headers=["name","phone","destination","source","status","followup","note"];const sample=[["Aarav Sharma","9800000000","Japan","Walk-in","New","2026-12-01","Interested in Japanese language course"]];if(format==="csv"){const csv=[headers,...sample].map(row=>row.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\\r\\n");downloadBlob(csv,"emc-leads-sample.csv","text/csv;charset=utf-8;");return;}if(!window.XLSX)return alert("Excel library could not be loaded. Please use the CSV sample format.");const ws=XLSX.utils.aoa_to_sheet([headers,...sample]);ws["!cols"]=headers.map(h=>({wch:Math.max(14,h.length+3)}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Leads");XLSX.writeFile(wb,"emc-leads-sample.xlsx");}
+function downloadBlob(content,filename,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=filename;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function normalizeLeadHeader(v){return String(v??"").trim().toLowerCase().replace(/[\\s_-]+/g,"");}
+async function importLeadContacts(event){const file=event.target.files?.[0];if(!file)return;const msg=$("bulkImportMsg");if(!isAdmin){msg.textContent="Only administrators can bulk upload leads.";return;}msg.textContent="Reading file…";try{let rows=[];const ext=file.name.split(".").pop().toLowerCase();if(ext==="csv"){const text=await file.text();rows=parseCSVRows(text);}else{if(!window.XLSX)throw new Error("Excel reader is unavailable. Refresh the page or upload CSV.");const data=await file.arrayBuffer(),wb=XLSX.read(data,{type:"array"});const sheet=wb.Sheets[wb.SheetNames[0]];rows=XLSX.utils.sheet_to_json(sheet,{defval:"",raw:false});}if(!rows.length)throw new Error("The file has no contact rows.");const normalized=rows.map(row=>{const out={};Object.entries(row).forEach(([k,v])=>out[normalizeLeadHeader(k)]=String(v??"").trim());return out;});const valid=[],errors=[];normalized.forEach((r,i)=>{const name=r.name||"",phone=r.phone||"";if(!name||!phone){errors.push(i+2);return;}valid.push({name,phone,destination:r.destination||"",source:r.source||"Other",status:r.status||"New",followup:r.followup||"",note:r.note||""});});if(!valid.length)throw new Error("No valid rows found. Ensure name and phone columns are present.");const seen=new Set(list("leads").map(x=>String(x.phone||"").replace(/[^0-9+]/g,"")).filter(Boolean));const unique=[];let duplicates=0;for(const item of valid){const key=item.phone.replace(/[^0-9+]/g,"");if(seen.has(key)){duplicates++;continue;}seen.add(key);unique.push(item);}let nextId=Math.max(0,...records.map(r=>Number(r.record_key)||0))+1,added=0;for(const item of unique){const data={...item,id:nextId++};const {error}=await sb.from(TABLE).insert({record_type:"leads",record_key:data.id,data});if(error)throw new Error(`Upload stopped after ${added} records: ${error.message}`);added++;}await loadRecords();msg.textContent=`Import complete: ${added} added, ${duplicates} duplicate phone number(s) skipped${errors.length?`, ${errors.length} row(s) missing name or phone`:""}.`; }catch(err){msg.textContent="Upload failed: "+err.message;}finally{event.target.value="";}}
+function parseCSVRows(text){const lines=text.replace(/^\\uFEFF/,"").split(/\\r?\\n/).filter(line=>line.trim());if(!lines.length)return[];const parseLine=line=>{const out=[];let cur="",quoted=false;for(let i=0;i<line.length;i++){const ch=line[i];if(ch==='"'&&quoted&&line[i+1]==='"'){cur+='"';i++;}else if(ch==='"')quoted=!quoted;else if(ch===","&&!quoted){out.push(cur);cur="";}else cur+=ch;}out.push(cur);return out;};const headers=parseLine(lines[0]);return lines.slice(1).map(line=>{const cells=parseLine(line),obj={};headers.forEach((h,i)=>obj[h]=cells[i]??"");return obj;});}
+function exportBackup(){const blob=new Blob([JSON.stringify({application:"Education Mines Consultancy",exported_at:new Date().toISOString(),records},null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="emc-backup-"+today()+".json";a.click();URL.revokeObjectURL(a.href);}
+(async()=>{const {data:{session}}=await sb.auth.getSession();if(session)await checkAccess();})();
+</script>
+</body>
+</html>
